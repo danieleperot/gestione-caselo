@@ -19,11 +19,18 @@ See [Architecture Decision Records](./docs/adrs/README.md) for detailed rational
 
 ### Prerequisites
 
+**Required:**
+
 - Docker & Docker Compose
-- Go 1.25+
-- Node.js 20+
 - AWS CLI (for LocalStack interaction)
-- pre-commit (optional): `pip install pre-commit`
+
+**For pre-commit hooks:**
+
+- Python 3 with pip: `pip install pre-commit`
+- Go 1.25+
+- Node.js 20+ with pnpm
+- golangci-lint ([installation](https://golangci-lint.run/welcome/install/))
+- Terraform and tflint (if working on infrastructure)
 
 ### Setup
 
@@ -31,19 +38,18 @@ See [Architecture Decision Records](./docs/adrs/README.md) for detailed rational
 # Install pre-commit hooks (optional but recommended)
 pre-commit install
 
-# Start local environment with LocalStack
-docker-compose up
+# Start all services (LocalStack, backend, frontend)
+docker compose up
 
-# Backend setup
-cd backend
-go mod download
-go test ./...
-
-# Frontend setup
-cd frontend
-npm install
-npm run dev
+# Or use watch mode for auto-reload on changes
+docker compose watch
 ```
+
+Access the application:
+
+- Frontend: <http://localhost:5173>
+- Backend API: <http://localhost:8080>
+- LocalStack: <http://localhost:4566>
 
 ### Development Workflow
 
