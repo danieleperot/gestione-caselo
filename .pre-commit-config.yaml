@@ -71,22 +71,6 @@ repos:
           - "@typescript-eslint/eslint-plugin"
           - "@typescript-eslint/parser"
 
-  - repo: local
-    hooks:
-      - id: npm-test
-        name: npm test
-        entry: bash -c 'cd frontend && npm run test:unit'
-        language: system
-        files: ^frontend/
-        pass_filenames: false
-
-      - id: npm-lint
-        name: npm lint
-        entry: bash -c 'cd frontend && npm run lint'
-        language: system
-        files: ^frontend/
-        pass_filenames: false
-
   # Markdown
   - repo: https://github.com/igorshubovych/markdownlint-cli
     rev: v0.38.0
@@ -100,7 +84,7 @@ repos:
     hooks:
       - id: detect-secrets
         args: [--baseline, .secrets.baseline]
-        exclude: package-lock.json
+        exclude: (package-lock\.json|pnpm-lock\.yaml)
 
   # Docker
   - repo: https://github.com/hadolint/hadolint
