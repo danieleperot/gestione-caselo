@@ -1,9 +1,46 @@
 <script setup>
+import { computed, ref } from "vue";
 import MonthCalendar from "./components/Calendar/MonthCalendar.vue";
+
+const selected = ref(new Date());
+const viewMonth = ref("");
+const viewRange = ref("");
+
+const minimumDateBeforeEvent = computed(() => {
+    const minimum = new Date();
+    minimum.setUTCDate(minimum.getUTCDate() + 3);
+
+    return minimum;
+});
+
+const handleViewChanged = ({ month, range }) => {
+    viewMonth.value = `Beginning: ${month.begin.toISOString()} | End: ${month.end.toISOString()}`;
+    viewRange.value = `Beginning: ${range.begin.toISOString()} | End: ${range.end.toISOString()}`;
+};
 </script>
 
 <template>
     <main class="flex items-center justify-center grow shrink min-h-0">
-        <MonthCalendar />
+        <div>
+            <MonthCalendar
+                v-model="selected"
+                :minimum-date="minimumDateBeforeEvent"
+                @view-changed="handleViewChanged"
+            />
+
+            <div class="text-xs p-4 text-center">
+                <div>Selected: {{ selected.toISOString() }}</div>
+
+                <div>
+                    <strong>MONTH:</strong>
+                    {{ viewMonth }}
+                </div>
+
+                <div>
+                    <strong>RANGE:</strong>
+                    {{ viewRange }}
+                </div>
+            </div>
+        </div>
     </main>
 </template>
