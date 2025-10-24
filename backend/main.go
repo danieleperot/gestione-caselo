@@ -13,22 +13,36 @@ import (
 	"github.com/daniele/gestione-caselo/internal/graphql"
 )
 
+func corsMiddleware(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Access-Control-Allow-Origin", "*")
+		w.Header().Set("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
+		w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
+
+		if r.Method == "OPTIONS" {
+			w.WriteHeader(http.StatusOK)
+			return
+		}
+
+		next.ServeHTTP(w, r)
+	})
+}
+
 func main() {
 	srv := handler.NewDefaultServer(graphql.NewExecutableSchema(graphql.Config{Resolvers: &graphql.Resolver{}}))
 
 	mux := http.NewServeMux()
-	mux.Handle("/", playground.Handler("GraphQL playground", "/query"))
-	mux.Handle("/query", srv)
+	mux.Handle("/", playground.Handler("GraphQL playground", "/graphql"))
+	mux.Handle("/graphql", srv)
 
-	// Check if running in Lambda
 	if os.Getenv("AWS_LAMBDA_FUNCTION_NAME") != "" {
 		// Lambda mode
-		lambda.Start(httpadapter.New(mux).ProxyWithContext)
+		lambda.Start(httpadapter.New(corsMiddleware(mux)).ProxyWithContext)
 	} else {
 		// Local development mode
 		fmt.Println("Server starting on :8080")
 		fmt.Println("GraphQL playground available at http://localhost:8080")
-		if err := http.ListenAndServe(":8080", mux); err != nil {
+		if err := http.ListenAndServe(":8080", corsMiddleware(mux)); err != nil {
 			log.Fatal(err)
 		}
 	}

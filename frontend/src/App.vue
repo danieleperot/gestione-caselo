@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, ref } from "vue";
 import MonthCalendar from "./components/Calendar/MonthCalendar.vue";
+import HelloWorld from "./components/HelloWorld.vue";
 
 interface ViewChangedPayload {
     month: {
@@ -33,6 +34,8 @@ const handleViewChanged = ({ month, range }: ViewChangedPayload): void => {
 <template>
     <main class="flex items-center justify-center grow shrink min-h-0">
         <div>
+            <HelloWorld />
+
             <MonthCalendar
                 v-model="selected"
                 :minimum-date="minimumDateBeforeEvent"

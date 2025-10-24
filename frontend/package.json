@@ -10,6 +10,8 @@
     "type-check": "vue-tsc --noEmit"
   },
   "dependencies": {
+    "graphql": "^16.11.0",
+    "graphql-request": "^7.3.1",
     "vue": "^3.4.0"
   },
   "devDependencies": {
