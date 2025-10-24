@@ -46,6 +46,15 @@ services:
     networks:
       - caselo-network
 
+  cognito-local:
+    image: jagregory/cognito-local:latest
+    ports:
+      - "9229:9229"
+    volumes:
+      - cognito-data:/app/.cognito
+    networks:
+      - caselo-network
+
 networks:
   caselo-network:
     driver: bridge
@@ -53,3 +62,4 @@ networks:
 volumes:
   localstack-data:
   pnpm-store:
+  cognito-data:
