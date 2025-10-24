@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 import { computed, ref, onMounted } from "vue";
 
 import DayButton from "./Partials/DayButton.vue";
@@ -7,44 +7,64 @@ import WeekDay from "./Partials/WeekDay.vue";
 import ChevronLeft from "../Icons/ChevronLeft.vue";
 import ChevronRight from "../Icons/ChevronRight.vue";
 
-const props = defineProps({
-    minimumDate: {
-        type: Date,
-        default: () => new Date(),
-    },
+interface DateInfo {
+    day: number;
+    date: Date;
+}
+
+interface ViewChangedPayload {
+    month: {
+        begin: Date;
+        end: Date;
+    };
+    range: {
+        begin: Date;
+        end: Date;
+    };
+}
+
+interface Props {
+    minimumDate?: Date;
+}
+
+const props = withDefaults(defineProps<Props>(), {
+    minimumDate: () => new Date(),
 });
-const emit = defineEmits(["viewChanged"]);
 
-const selectedDate = defineModel({ default: () => new Date() });
-const viewingDate = ref(new Date(selectedDate.value));
+const emit = defineEmits<{
+    viewChanged: [payload: ViewChangedPayload];
+}>();
 
-const selectedMidnight = computed(() => {
+const selectedDate = defineModel<Date>({ default: () => new Date() });
+const viewingDate = ref<Date>(new Date(selectedDate.value));
+
+const selectedMidnight = computed<Date>(() => {
     const midnight = new Date(selectedDate.value);
     midnight.setUTCHours(0, 0, 0, 0);
 
     return midnight;
 });
 
-const minimumDateBeforeEvent = computed(() => {
+const minimumDateBeforeEvent = computed<Date>(() => {
     const minimum = new Date(props.minimumDate);
     minimum.setUTCHours(0, 0, 0, 0);
 
     return minimum;
 });
 
-const viewingMonth = computed(() => {
+const viewingMonth = computed<number>(() => {
     return viewingDate.value.getUTCMonth();
 });
 
-const viewingYear = computed(() => {
+const viewingYear = computed<number>(() => {
     return viewingDate.value.getUTCFullYear();
 });
 
-const viewingMonthLabel = computed(() => {
+const viewingMonthLabel = computed<string>(() => {
     return viewingDate.value.toLocaleString("it-IT", { month: "long" });
 });
 
-const previousMonth = computed(() => {
+const previousMonth = computed<Date>(() => {
     const previousMonth = new Date(viewingDate.value);
     previousMonth.setUTCMonth(viewingMonth.value - 1);
     previousMonth.setUTCDate(1);
@@ -52,14 +72,14 @@ const previousMonth = computed(() => {
     return previousMonth;
 });
 
-const firstWeekDayOfTheMonth = computed(() => {
+const firstWeekDayOfTheMonth = computed<number>(() => {
     const firstDay = new Date(viewingDate.value);
     firstDay.setUTCDate(1);
 
     return firstDay.getUTCDay();
 });
 
-const canGoBack = computed(() => {
+const canGoBack = computed<boolean>(() => {
     return (
         previousMonth.value.getUTCFullYear() >
             minimumDateBeforeEvent.value.getUTCFullYear() ||
@@ -68,7 +88,7 @@ const canGoBack = computed(() => {
     );
 });
 
-const daysInCurrentMonth = computed(() => {
+const daysInCurrentMonth = computed<number>(() => {
     // Very neat trick suggested by AI. By setting the day to 0,
     // JS actually rolls back to the last day of the previous month
     const monthDate = new Date(viewingDate.value);
@@ -78,17 +98,7 @@ const daysInCurrentMonth = computed(() => {
     return monthDate.getUTCDate();
 });
 
-const daysInPreviousMonth = computed(() => {
-    // Very neat trick suggested by AI. By setting the day to 0,
-    // JS actually rolls back to the last day of the previous month
-    const monthDate = new Date(viewingDate.value);
-    monthDate.setUTCMonth(monthDate.getUTCMonth());
-    monthDate.setUTCDate(0);
-
-    return monthDate.getUTCDate();
-});
-
-const previousDaysToRender = computed(() => {
+const previousDaysToRender = computed<DateInfo[]>(() => {
     const size =
         firstWeekDayOfTheMonth.value > 0 ? firstWeekDayOfTheMonth.value - 1 : 6;
 
@@ -105,14 +115,14 @@ const previousDaysToRender = computed(() => {
         .reverse();
 });
 
-const nextDaysToRender = computed(() => {
+const nextDaysToRender = computed<DateInfo[]>(() => {
     const maxDays = 6 /* weeks */ * 7; /* days a week */
     const renderedUntilNow =
         previousDaysToRender.value.length + daysInCurrentMonth.value;
     const size = maxDays - renderedUntilNow;
 
     if (isNaN(size)) {
-        return new Array();
+        return new Array<DateInfo>();
     }
 
     return new Array(maxDays - renderedUntilNow).fill({}).map((_, index) => {
@@ -125,10 +135,10 @@ const nextDaysToRender = computed(() => {
     });
 });
 
-const prevMonth = () => changeMonth(-1);
-const nextMonth = () => changeMonth(+1);
+const prevMonth = (): void => changeMonth(-1);
+const nextMonth = (): void => changeMonth(+1);
 
-const changeMonth = (toAdd) => {
+const changeMonth = (toAdd: number): void => {
     const newDate = new Date(viewingDate.value);
     newDate.setUTCMonth(viewingMonth.value + toAdd);
 
@@ -137,7 +147,7 @@ const changeMonth = (toAdd) => {
     emitViewChanged();
 };
 
-const emitViewChanged = () => {
+const emitViewChanged = (): void => {
     const beginMonth = new Date(viewingDate.value);
     beginMonth.setUTCDate(1);
     beginMonth.setUTCHours(0, 0, 0, 0);
@@ -155,8 +165,11 @@ const emitViewChanged = () => {
 
     let endRange = new Date(endMonth);
     if (nextDaysToRender.value.length) {
-        endRange = new Date(nextDaysToRender.value.at(-1).date);
-        endRange.setUTCHours(23, 59, 59, 999);
+        const lastDay = nextDaysToRender.value.at(-1);
+        if (lastDay) {
+            endRange = new Date(lastDay.date);
+            endRange.setUTCHours(23, 59, 59, 999);
+        }
     }
 
     emit("viewChanged", {
@@ -165,7 +178,7 @@ const emitViewChanged = () => {
     });
 };
 
-const datesToDisplay = computed(() => {
+const datesToDisplay = computed<DateInfo[]>(() => {
     return new Array(daysInCurrentMonth.value).fill({}).map((_, index) => {
         const date = new Date(viewingDate.value);
         date.setUTCDate(index + 1);
@@ -175,7 +188,7 @@ const datesToDisplay = computed(() => {
     });
 });
 
-const now = ref(new Date());
+const now = ref<Date>(new Date());
 now.value.setUTCHours(0, 0, 0, 0);
 
 onMounted(() => {
@@ -200,7 +213,7 @@ onMounted(() => {
     emitViewChanged();
 });
 
-const isBusy = (date) => {
+const isBusy = (date: Date): boolean => {
     return date.getDate() % 3 === 0;
 };
 </script>

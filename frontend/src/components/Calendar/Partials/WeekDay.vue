@@ -1,13 +1,12 @@
-<script setup>
-defineProps({
-    letter: {
-        type: String,
-        default: "",
-    },
-    fullDay: {
-        type: String,
-        default: "",
-    },
+<script setup lang="ts">
+interface Props {
+    letter?: string;
+    fullDay?: string;
+}
+
+withDefaults(defineProps<Props>(), {
+    letter: "",
+    fullDay: "",
 });
 </script>
 

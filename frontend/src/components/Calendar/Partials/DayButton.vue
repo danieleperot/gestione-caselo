@@ -1,29 +1,20 @@
-<script setup>
-defineProps({
-    busy: {
-        type: Boolean,
-        default: false,
-    },
-    day: {
-        type: [Number, String],
-        default: 0,
-    },
-    disabled: {
-        type: Boolean,
-        default: false,
-    },
-    outOfMonth: {
-        type: Boolean,
-        default: false,
-    },
-    selected: {
-        type: Boolean,
-        default: false,
-    },
-    today: {
-        type: Boolean,
-        default: false,
-    },
+<script setup lang="ts">
+interface Props {
+    busy?: boolean;
+    day?: number | string;
+    disabled?: boolean;
+    outOfMonth?: boolean;
+    selected?: boolean;
+    today?: boolean;
+}
+
+withDefaults(defineProps<Props>(), {
+    busy: false,
+    day: 0,
+    disabled: false,
+    outOfMonth: false,
+    selected: false,
+    today: false,
 });
 </script>
 

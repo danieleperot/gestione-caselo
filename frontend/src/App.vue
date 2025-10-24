@@ -1,19 +1,30 @@
-<script setup>
+<script setup lang="ts">
 import { computed, ref } from "vue";
 import MonthCalendar from "./components/Calendar/MonthCalendar.vue";
 
-const selected = ref(new Date());
-const viewMonth = ref("");
-const viewRange = ref("");
+interface ViewChangedPayload {
+    month: {
+        begin: Date;
+        end: Date;
+    };
+    range: {
+        begin: Date;
+        end: Date;
+    };
+}
 
-const minimumDateBeforeEvent = computed(() => {
+const selected = ref<Date>(new Date());
+const viewMonth = ref<string>("");
+const viewRange = ref<string>("");
+
+const minimumDateBeforeEvent = computed<Date>(() => {
     const minimum = new Date();
     minimum.setUTCDate(minimum.getUTCDate() + 3);
 
     return minimum;
 });
 
-const handleViewChanged = ({ month, range }) => {
+const handleViewChanged = ({ month, range }: ViewChangedPayload): void => {
     viewMonth.value = `Beginning: ${month.begin.toISOString()} | End: ${month.end.toISOString()}`;
     viewRange.value = `Beginning: ${range.begin.toISOString()} | End: ${range.end.toISOString()}`;
 };
