@@ -36,20 +36,20 @@ Typical docker-compose.yml services:
 
 The preferred development workflow is:
 
-1. **I write unit tests first** - Covering the expected behavior
-2. **You implement production code** - To make tests pass
-3. **You learn by doing** - Writing code to solve test requirements
-4. **I provide guidance** - Via docs, examples, or explanations when needed
+1. **Claude writes unit tests first** - Covering the expected behavior
+2. **Human implements production code** - To make tests pass
+3. **Human learns by doing** - Writing code to solve test requirements
+4. **Claude provides guidance** - Via docs, examples, or explanations when needed
 
 ### Code-First Philosophy
 
-You prefer to code first and learn through implementation. When you need help:
+Human prefers to code first and learn through implementation. When human needs help:
 
-- Ask for Go documentation links or explanations
-- Request examples of patterns you're implementing
-- Ask for guidance on testing strategies
+- Claude provides Go documentation links or explanations
+- Claude provides examples of patterns being implemented
+- Claude provides guidance on testing strategies
 
-I will provide pointers to relevant docs rather than writing extensive code unless explicitly requested.
+Claude will provide pointers to relevant docs rather than writing extensive code unless explicitly requested.
 
 ## Communication Style
 
@@ -301,9 +301,9 @@ Note: `docs/remote/` is gitignored - it's your local knowledge base.
 
 Typical workflow for a feature:
 
-1. **I write failing tests** defining the expected behavior
-2. **You make tests pass** with minimal implementation
-3. **You refactor** if needed (tests still passing)
+1. **Claude writes failing tests** defining the expected behavior
+2. **Human makes tests pass** with minimal implementation
+3. **Human refactors** if needed (tests still passing)
 4. **Repeat** for next feature/test case
 
 If you're stuck, ask for:
