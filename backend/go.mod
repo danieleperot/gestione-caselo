@@ -12,6 +12,7 @@ require (
 	github.com/aws/aws-lambda-go v1.50.0 // indirect
 	github.com/awslabs/aws-lambda-go-api-proxy v0.16.2 // indirect
 	github.com/go-viper/mapstructure/v2 v2.4.0 // indirect
+	github.com/golang-jwt/jwt/v5 v5.3.0 // indirect
 	github.com/google/uuid v1.6.0 // indirect
 	github.com/gorilla/websocket v1.5.0 // indirect
 	github.com/hashicorp/golang-lru/v2 v2.0.7 // indirect
