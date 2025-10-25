@@ -2,6 +2,7 @@
 import { computed, ref } from "vue";
 import MonthCalendar from "./components/Calendar/MonthCalendar.vue";
 import HelloWorld from "./components/HelloWorld.vue";
+import AutoLogin from "./components/AutoLogin.vue";
 
 interface ViewChangedPayload {
     month: {
@@ -34,6 +35,7 @@ const handleViewChanged = ({ month, range }: ViewChangedPayload): void => {
 <template>
     <main class="flex items-center justify-center grow shrink min-h-0">
         <div>
+            <AutoLogin />
             <HelloWorld />
 
             <MonthCalendar
