@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"strings"
 
+	"github.com/MicahParks/keyfunc/v3"
 	"github.com/golang-jwt/jwt/v5"
 )
 
@@ -18,11 +19,13 @@ type CognitoClaims struct {
 	jwt.RegisteredClaims
 }
 
-func extractUserFromJWT(tokenString string) (*User, error) {
-	token, err := jwt.ParseWithClaims(tokenString, &CognitoClaims{}, func(t *jwt.Token) (any, error) {
-		// TODO: implement checking against Cognito
-		return []byte(""), nil
-	}, jwt.WithValidMethods([]string{jwt.SigningMethodRS256.Alg()}))
+func extractUserFromJWT(k keyfunc.Keyfunc, tokenString string) (*User, error) {
+	token, err := jwt.ParseWithClaims(
+		tokenString,
+		&CognitoClaims{},
+		k.Keyfunc,
+		jwt.WithValidMethods([]string{jwt.SigningMethodRS256.Alg()}),
+	)
 
 	if err != nil {
 		return nil, err
@@ -37,6 +40,11 @@ func extractUserFromJWT(tokenString string) (*User, error) {
 }
 
 func Middleware(config Config) func(next http.Handler) http.Handler {
+	k, err := keyfunc.NewDefault([]string{config.JWKSUrl})
+	if err != nil {
+		panic("Failed to initialize JWKS: " + err.Error())
+	}
+
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			authHeader := r.Header.Get("Authorization")
@@ -51,7 +59,7 @@ func Middleware(config Config) func(next http.Handler) http.Handler {
 				return
 			}
 
-			user, err := extractUserFromJWT(parts[1])
+			user, err := extractUserFromJWT(k, parts[1])
 			if err != nil {
 				http.Error(w, "unauthorized token", http.StatusUnauthorized)
 				return

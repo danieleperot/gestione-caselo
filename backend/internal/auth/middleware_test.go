@@ -4,11 +4,22 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"testing"
+	"time"
 
 	"github.com/daniele/gestione-caselo/internal/auth"
 )
 
 func TestAuthMiddleware(t *testing.T) {
+	// Create mock JWKS server
+	jwks := newTestJWKS(t)
+	defer jwks.close()
+
+	// Generate valid test token
+	validToken, err := jwks.createToken("test-user-123", "test@example.com", time.Now().Add(1*time.Hour))
+	if err != nil {
+		t.Fatalf("failed to create test token: %v", err)
+	}
+
 	tests := []struct {
 		name           string
 		authHeader     string
@@ -33,8 +44,24 @@ func TestAuthMiddleware(t *testing.T) {
 			wantStatusCode: http.StatusUnauthorized,
 			wantUserInCtx:  false,
 		},
-		// Note: Testing with valid token requires actual JWT from cognito-local
-		// This would be an integration test rather than unit test
+		{
+			name:           "invalid token",
+			authHeader:     "Bearer invalid.jwt.token",
+			wantStatusCode: http.StatusUnauthorized,
+			wantUserInCtx:  false,
+		},
+		{
+			name:           "valid token",
+			authHeader:     "Bearer " + validToken,
+			wantStatusCode: http.StatusOK,
+			wantUserInCtx:  true,
+		},
+		{
+			name:           "expired token",
+			authHeader:     "Bearer " + createExpiredToken(t, jwks),
+			wantStatusCode: http.StatusUnauthorized,
+			wantUserInCtx:  false,
+		},
 	}
 
 	for _, tt := range tests {
@@ -48,12 +75,23 @@ func TestAuthMiddleware(t *testing.T) {
 				if !tt.wantUserInCtx && user != nil {
 					t.Errorf("Expected no user in context, got %v", user)
 				}
+
+				// If user expected, validate the data
+				if tt.wantUserInCtx && user != nil {
+					if user.ID != "test-user-123" {
+						t.Errorf("Expected user ID 'test-user-123', got '%s'", user.ID)
+					}
+					if user.Email != "test@example.com" {
+						t.Errorf("Expected email 'test@example.com', got '%s'", user.Email)
+					}
+				}
+
 				w.WriteHeader(http.StatusOK)
 			})
 
 			// Wrap with auth middleware
 			config := auth.Config{
-				JWKSUrl: "http://localhost:9229/test-pool/.well-known/jwks.json",
+				JWKSUrl: jwks.server.URL + "/.well-known/jwks.json",
 			}
 			handler := auth.Middleware(config)(testHandler)
 
@@ -74,4 +112,13 @@ func TestAuthMiddleware(t *testing.T) {
 			}
 		})
 	}
+}
+
+// Helper to create expired token for testing
+func createExpiredToken(t *testing.T, jwks *testJWKS) string {
+	token, err := jwks.createToken("expired-user", "expired@example.com", time.Now().Add(-1*time.Hour))
+	if err != nil {
+		t.Fatalf("failed to create expired token: %v", err)
+	}
+	return token
 }
