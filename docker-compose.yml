@@ -17,6 +17,8 @@ services:
     build: ./backend
     ports:
       - "8080:8080"
+    env_file:
+      - ./backend/.env
     environment:
       - AWS_ENDPOINT_URL=http://localstack:4566
       - AWS_REGION=eu-south-1
@@ -24,6 +26,7 @@ services:
       - AWS_SECRET_ACCESS_KEY=test
     depends_on:
       - localstack
+      - cognito-local
     volumes:
       - ./backend:/app
     networks:
@@ -42,7 +45,22 @@ services:
       - /app/node_modules
       - pnpm-store:/root/.local/share/pnpm/store
     environment:
-      - VITE_API_URL=http://localhost:8080
+      - VITE_API_URL=http://localhost:8080/graphql
+    networks:
+      - caselo-network
+    develop:
+      watch:
+        - action: rebuild
+          path: ./frontend/package.json
+        - action: rebuild
+          path: ./frontend/pnpm-lock.yaml
+
+  cognito-local:
+    image: jagregory/cognito-local:latest
+    ports:
+      - "9229:9229"
+    volumes:
+      - cognito-data:/app/.cognito
     networks:
       - caselo-network
 
@@ -53,3 +71,4 @@ networks:
 volumes:
   localstack-data:
   pnpm-store:
+  cognito-data:

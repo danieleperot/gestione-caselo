@@ -1,6 +1,6 @@
 # Gestione Caselo
 
-Booking system for Caselo di Salzan, a historic Venetian building used for events.
+Booking system for Caselo di Salzan, a historic building used for events.
 
 ## Architecture
 
