@@ -24,8 +24,8 @@ withDefaults(defineProps<Props>(), {
             :disabled="disabled || selected"
             class="day-button__inner relative rounded-full w-full h-full transition duration-150"
             :class="{
-                'before:absolute before:bg-slate-500 active:bg-slate-500 before:rounded-full tex':
-                    busy && !disabled,
+                'before:absolute before:bg-slate-300 active:bg-slate-500 before:rounded-full tex':
+                    busy,
                 'bg-slate-50': !outOfMonth && !disabled,
                 'text-slate-500': outOfMonth && !disabled,
                 'text-slate-200 before:none': disabled,

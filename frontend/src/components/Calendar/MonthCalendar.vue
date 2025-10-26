@@ -35,11 +35,11 @@ const emit = defineEmits<{
     viewChanged: [payload: ViewChangedPayload];
 }>();
 
-const selectedDate = defineModel<Date>({ default: () => new Date() });
-const viewingDate = ref<Date>(new Date(selectedDate.value));
+const selectedDate = defineModel<Date | null>({ default: () => null });
+const viewingDate = ref<Date>(new Date(selectedDate.value || new Date()));
 
 const selectedMidnight = computed<Date>(() => {
-    const midnight = new Date(selectedDate.value);
+    const midnight = new Date(selectedDate.value || new Date());
     midnight.setUTCHours(0, 0, 0, 0);
 
     return midnight;
@@ -135,10 +135,14 @@ const nextDaysToRender = computed<DateInfo[]>(() => {
     });
 });
 
-const prevMonth = (): void => changeMonth(-1);
-const nextMonth = (): void => changeMonth(+1);
+const prevMonth = (date: Date | null): void => changeMonth(-1, date);
+const nextMonth = (date: Date | null): void => changeMonth(+1, date);
 
-const changeMonth = (toAdd: number): void => {
+const changeMonth = (toAdd: number, date: Date | null): void => {
+    if (date) {
+        selectedDate.value = date;
+    }
+
     const newDate = new Date(viewingDate.value);
     newDate.setUTCMonth(viewingMonth.value + toAdd);
 
@@ -206,7 +210,10 @@ onMounted(() => {
     }
 
     // On purpose less than, not equal
-    if (selectedMidnight.value.getTime() < minimum.getTime()) {
+    if (
+        selectedDate.value &&
+        selectedMidnight.value.getTime() < minimum.getTime()
+    ) {
         selectedDate.value = new Date(minimumDateBeforeEvent.value);
     }
 
@@ -228,7 +235,7 @@ const isBusy = (date: Date): boolean => {
                     'hover:bg-slate-50 active:bg-slate-50 transition':
                         canGoBack,
                 }"
-                @click="prevMonth()"
+                @click="prevMonth(null)"
             >
                 <ChevronLeft aria-label="Mese precedente" />
             </button>
@@ -237,7 +244,7 @@ const isBusy = (date: Date): boolean => {
             </div>
             <button
                 class="w-10 h-10 flex items-center justify-center disabled:text-slate-400 rounded-full bg-transparent hover:bg-slate-50 active:bg-slate-50 transition"
-                @click="nextMonth()"
+                @click="nextMonth(null)"
             >
                 <ChevronRight aria-label="Mese successivo" />
             </button>
@@ -258,9 +265,13 @@ const isBusy = (date: Date): boolean => {
                 :key="day"
                 :busy="isBusy(date)"
                 :day="day"
-                :disabled="!canGoBack"
+                :disabled="
+                    isBusy(date) ||
+                    !canGoBack ||
+                    date.getTime() < minimumDateBeforeEvent.getTime()
+                "
                 out-of-month
-                @click="prevMonth()"
+                @click="prevMonth(date)"
             />
 
             <DayButton
@@ -268,8 +279,16 @@ const isBusy = (date: Date): boolean => {
                 :key="day"
                 :busy="isBusy(date)"
                 :day="day"
-                :disabled="date.getTime() < minimumDateBeforeEvent.getTime()"
-                :selected="date.getTime() === selectedMidnight.getTime()"
+                :disabled="
+                    isBusy(date) ||
+                    date.getTime() < minimumDateBeforeEvent.getTime()
+                "
+                :selected="
+                    Boolean(
+                        selectedDate &&
+                            date.getTime() === selectedMidnight.getTime(),
+                    )
+                "
                 :today="date.getTime() === now.getTime()"
                 @click="selectedDate = new Date(date)"
             />
@@ -278,9 +297,10 @@ const isBusy = (date: Date): boolean => {
                 v-for="{ date, day } in nextDaysToRender"
                 :key="day"
                 :busy="isBusy(date)"
+                :disabled="isBusy(date)"
                 :day="day"
                 out-of-month
-                @click="nextMonth()"
+                @click="nextMonth(date)"
             />
         </div>
     </div>

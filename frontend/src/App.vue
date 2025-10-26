@@ -15,7 +15,7 @@ interface ViewChangedPayload {
     };
 }
 
-const selected = ref<Date>(new Date());
+const selected = ref<Date | null>(null);
 const viewMonth = ref<string>("");
 const viewRange = ref<string>("");
 
@@ -43,20 +43,6 @@ const handleViewChanged = ({ month, range }: ViewChangedPayload): void => {
                 :minimum-date="minimumDateBeforeEvent"
                 @view-changed="handleViewChanged"
             />
-
-            <div class="text-xs p-4 text-center">
-                <div>Selected: {{ selected.toISOString() }}</div>
-
-                <div>
-                    <strong>MONTH:</strong>
-                    {{ viewMonth }}
-                </div>
-
-                <div>
-                    <strong>RANGE:</strong>
-                    {{ viewRange }}
-                </div>
-            </div>
         </div>
     </main>
 </template>
