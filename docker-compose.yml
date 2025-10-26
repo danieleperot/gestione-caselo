@@ -1,18 +1,4 @@
 services:
-  localstack:
-    image: localstack/localstack:latest
-    ports:
-      - "4566:4566"
-    environment:
-      - SERVICES=dynamodb,s3,lambda,cognito-idp
-      - DEBUG=1
-      - DOCKER_HOST=unix:///var/run/docker.sock
-    volumes:
-      - "/var/run/docker.sock:/var/run/docker.sock"
-      - localstack-data:/var/lib/localstack
-    networks:
-      - caselo-network
-
   backend:
     build: ./backend
     ports:
@@ -20,12 +6,10 @@ services:
     env_file:
       - ./backend/.env
     environment:
-      - AWS_ENDPOINT_URL=http://localstack:4566
       - AWS_REGION=eu-south-1
       - AWS_ACCESS_KEY_ID=test
       - AWS_SECRET_ACCESS_KEY=test
     depends_on:
-      - localstack
       - cognito-local
     volumes:
       - ./backend:/app
@@ -54,9 +38,12 @@ services:
           path: ./frontend/package.json
         - action: rebuild
           path: ./frontend/pnpm-lock.yaml
+        - action: restart
+          path: ./frontend/.env
 
   cognito-local:
     image: jagregory/cognito-local:latest
+    stop_grace_period: "1s"
     ports:
       - "9229:9229"
     volumes:
@@ -69,6 +56,5 @@ networks:
     driver: bridge
 
 volumes:
-  localstack-data:
   pnpm-store:
   cognito-data:

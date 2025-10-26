@@ -20,17 +20,15 @@ Refer to ADRs for detailed rationale and trade-offs.
 
 All local development uses **Docker + Docker Compose** for consistency and isolation:
 
-- **LocalStack Community**: Emulate AWS services locally (DynamoDB, S3, Lambda, Cognito, etc.)
-- **Use LocalStack whenever possible** for testing AWS integrations
-- **Docker Compose**: Orchestrate all services (LocalStack, backend, frontend, databases)
+- **AWS Service Emulation**: AWS services replaced with first or third party containers for local development when possible (e.g., cognito-local for Cognito)
+- **Docker Compose**: Orchestrate all services (backend, frontend, local AWS service containers)
 - **No AWS credentials needed** for local development
 
 Typical docker-compose.yml services:
 
-- `localstack`: AWS service emulation
+- `cognito-local`: Local Cognito emulation
 - `backend`: Go Lambda functions running locally
 - `frontend`: Vue dev server with hot reload
-- `dynamodb-admin` (optional): UI for viewing DynamoDB tables
 
 ### Test-Driven Learning Approach
 
@@ -150,7 +148,7 @@ GSI1SK: USER
 ### Backend Tests
 
 - **Unit tests**: Test business logic in isolation
-- **Integration tests**: Test DynamoDB operations with LocalStack
+- **Integration tests**: Test DynamoDB operations with local AWS service containers
 - **Mock external dependencies**: AWS services, Cognito, etc.
 - **Coverage goal**: Not enforced, but focus on critical paths
 
@@ -211,7 +209,7 @@ gestione-caselo/
 ### Docker Environment
 
 ```bash
-docker-compose up              # Start all services (LocalStack, backend, frontend)
+docker-compose up              # Start all services (backend, frontend, local AWS containers)
 docker-compose down            # Stop all services
 docker-compose logs -f backend # Follow backend logs
 docker-compose exec backend sh # Shell into backend container
@@ -224,9 +222,6 @@ cd backend
 go test ./...                    # Run tests
 go build -o bootstrap            # Build Lambda binary
 GOOS=linux GOARCH=amd64 go build # Build for Lambda deployment
-
-# With LocalStack
-AWS_ENDPOINT_URL=http://localhost:4566 go test ./... # Test against LocalStack
 ```
 
 ### Frontend
@@ -246,28 +241,6 @@ cd terraform/environments/dev
 terraform init       # Initialize
 terraform plan       # Preview changes
 terraform apply      # Apply changes
-
-# With LocalStack (for testing Terraform locally)
-tflocal init         # Initialize with LocalStack
-tflocal plan         # Plan with LocalStack endpoints
-tflocal apply        # Apply to LocalStack
-```
-
-### LocalStack
-
-```bash
-# Create DynamoDB table locally
-aws --endpoint-url=http://localhost:4566 dynamodb create-table \
-  --table-name gestione-caselo-dev \
-  --attribute-definitions AttributeName=PK,AttributeType=S AttributeName=SK,AttributeType=S \
-  --key-schema AttributeName=PK,KeyType=HASH AttributeName=SK,KeyType=RANGE \
-  --billing-mode PAY_PER_REQUEST
-
-# List local S3 buckets
-aws --endpoint-url=http://localhost:4566 s3 ls
-
-# View Cognito user pools
-aws --endpoint-url=http://localhost:4566 cognito-idp list-user-pools --max-results 10
 ```
 
 ## Documentation Strategy
