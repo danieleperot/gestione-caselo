@@ -77,7 +77,7 @@ Go is a statically-typed, compiled language developed by Google that is particul
 
 - Use Go modules for dependency management
 - Leverage Go's built-in testing framework
-- Use AWS SAM or LocalStack for local Lambda testing
+- Use first or third party containers for local AWS service emulation when possible
 - Compilation step required before deployment (handled by CI/CD)
 
 ## Alternatives Considered

@@ -51,7 +51,8 @@ We will use AWS serverless architecture with the following components:
   - Mitigation: Acceptable for booking system use case; users won't notice occasional delays
 - **Vendor Lock-in**: Deep integration with AWS services makes migration to other platforms difficult
   - Mitigation: Low traffic means costs will remain minimal even long-term
-- **Local Development Complexity**: Testing serverless architecture locally requires tools like LocalStack or SAM
+- **Local Development Complexity**: Testing serverless architecture locally requires AWS service emulation
+  - Mitigation: Use first or third party containers for local development when possible
 - **Lambda Limitations**:
   - 15-minute maximum execution time
   - 10GB memory limit

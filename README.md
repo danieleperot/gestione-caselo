@@ -22,7 +22,7 @@ See [Architecture Decision Records](./docs/adrs/README.md) for detailed rational
 **Required:**
 
 - Docker & Docker Compose
-- AWS CLI (for LocalStack interaction)
+- AWS CLI (for local AWS service container interaction)
 
 **For pre-commit hooks:**
 
@@ -38,7 +38,7 @@ See [Architecture Decision Records](./docs/adrs/README.md) for detailed rational
 # Install pre-commit hooks (optional but recommended)
 pre-commit install
 
-# Start all services (LocalStack, backend, frontend)
+# Start all services (backend, frontend, local AWS service containers)
 docker compose up
 
 # Or use watch mode for auto-reload on changes
@@ -49,7 +49,6 @@ Access the application:
 
 - Frontend: <http://localhost:5173>
 - Backend API: <http://localhost:8080>
-- LocalStack: <http://localhost:4566>
 
 ### Development Workflow
 
