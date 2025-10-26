@@ -73,6 +73,8 @@ cat > backend/.env <<EOF
 COGNITO_ENDPOINT=http://cognito-local:9229
 COGNITO_USER_POOL_ID=${USER_POOL_ID}
 COGNITO_REGION=eu-south-1
+
+ALLOWED_ORIGINS="http://localhost:5173"
 EOF
 
 # Frontend .env
@@ -81,6 +83,8 @@ VITE_COGNITO_ENDPOINT=http://localhost:9229
 VITE_COGNITO_USER_POOL_ID=${USER_POOL_ID}
 VITE_COGNITO_CLIENT_ID=${CLIENT_ID}
 VITE_COGNITO_REGION=eu-south-1
+
+VITE_USE_COGNITO_USER_PASSWORD_FLOW=true
 EOF
 
 echo -e "${GREEN}✓ Configuration saved to .env files${NC}"
