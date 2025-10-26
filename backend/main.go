@@ -15,8 +15,13 @@ import (
 )
 
 func corsMiddleware(next http.Handler) http.Handler {
+	origins, ok := os.LookupEnv("ALLOWED_ORIGINS")
+	if !ok {
+		origins = ""
+	}
+
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set("Access-Control-Allow-Origin", "*")
+		w.Header().Set("Access-Control-Allow-Origin", origins)
 		w.Header().Set("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
 		w.Header().Set("Access-Control-Allow-Headers", "Content-Type, Authorization")
 
