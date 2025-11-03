@@ -22,17 +22,17 @@ withDefaults(defineProps<Props>(), {
     <div class="day-button w-10 h-10 shrink-0 flex items-center justify-center">
         <button
             :disabled="disabled || selected"
-            class="day-button__inner relative rounded-full w-full h-full transition duration-150"
+            class="day-button__inner relative rounded-full w-full h-full transition duration-150 cursor-pointer disabled:cursor-default"
             :class="{
                 'before:absolute before:bg-slate-300 active:bg-slate-500 before:rounded-full tex':
                     busy,
-                'bg-slate-50': !outOfMonth && !disabled,
+                'bg-slate-50': !outOfMonth && !disabled && !selected,
                 'text-slate-500': outOfMonth && !disabled,
                 'text-slate-200 before:none': disabled,
                 'hover:bg-slate-300 hover:text-slate-900':
                     !disabled && !selected,
                 'border-2 border-slate-500': today,
-                'bg-teal-100': selected,
+                'bg-purple-200': selected,
             }"
         >
             {{ day }}

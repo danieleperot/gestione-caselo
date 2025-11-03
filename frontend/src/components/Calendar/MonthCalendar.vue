@@ -12,27 +12,23 @@ interface DateInfo {
     date: Date;
 }
 
-interface ViewChangedPayload {
-    month: {
-        begin: Date;
-        end: Date;
-    };
-    range: {
-        begin: Date;
-        end: Date;
-    };
-}
-
-interface Props {
-    minimumDate?: Date;
-}
-
-const props = withDefaults(defineProps<Props>(), {
+const props = withDefaults(defineProps<{ minimumDate?: Date }>(), {
     minimumDate: () => new Date(),
 });
 
 const emit = defineEmits<{
-    viewChanged: [payload: ViewChangedPayload];
+    viewChanged: [
+        payload: {
+            month: {
+                begin: Date;
+                end: Date;
+            };
+            range: {
+                begin: Date;
+                end: Date;
+            };
+        },
+    ];
 }>();
 
 const selectedDate = defineModel<Date | null>({ default: () => null });
@@ -226,11 +222,13 @@ const isBusy = (date: Date): boolean => {
 </script>
 
 <template>
-    <div class="border-2 border-teal-200 p-4 rounded-2xl text-slate-900">
+    <div
+        class="border-2 border-purple-200 p-4 rounded-2xl text-slate-900 shadow"
+    >
         <div class="flex items-center justify-between mb-6">
             <button
                 :disabled="!canGoBack"
-                class="w-10 h-10 flex items-center justify-center disabled:text-slate-400 rounded-full bg-transparent"
+                class="w-10 h-10 flex items-center justify-center disabled:text-slate-400 rounded-full bg-transparent cursor-pointer"
                 :class="{
                     'hover:bg-slate-50 active:bg-slate-50 transition':
                         canGoBack,
@@ -243,7 +241,7 @@ const isBusy = (date: Date): boolean => {
                 {{ viewingMonthLabel }} {{ viewingYear }}
             </div>
             <button
-                class="w-10 h-10 flex items-center justify-center disabled:text-slate-400 rounded-full bg-transparent hover:bg-slate-50 active:bg-slate-50 transition"
+                class="w-10 h-10 flex items-center justify-center disabled:text-slate-400 rounded-full bg-transparent hover:bg-slate-50 active:bg-slate-50 transition cursor-pointer"
                 @click="nextMonth(null)"
             >
                 <ChevronRight aria-label="Mese successivo" />

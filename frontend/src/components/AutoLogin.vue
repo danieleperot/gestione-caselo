@@ -17,7 +17,7 @@ const handleLogin = () => {
         <div v-if="!user" class="logged-out">
             <button
                 @click="handleLogin"
-                class="border rounded-md shadow px-6 py-2 hover:shadow-lg transition-all active:bg-gray-200"
+                class="border rounded-md shadow px-6 py-2 hover:shadow-lg transition-all active:bg-gray-200 cursor-pointer"
             >
                 Login as Test User
             </button>
@@ -26,7 +26,7 @@ const handleLogin = () => {
             <span class="user-info">Logged in as: {{ user.email }}</span>
             <button
                 @click="logout"
-                class="border rounded-md shadow px-6 py-2 hover:shadow-lg transition-all active:bg-gray-200"
+                class="border rounded-md shadow px-6 py-2 hover:shadow-lg transition-all active:bg-gray-200 cursor-pointer"
             >
                 Logout
             </button>
