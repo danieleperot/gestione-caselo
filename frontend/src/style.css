@@ -1,11 +1,47 @@
 @import "tailwindcss";
+@import url(https://fonts.bunny.net/css?family=cantarell);
 
 html,
-body {
-    align-items: center;
+body,
+#app {
+    /*align-items: center;*/
     display: flex;
     flex: 1 0 auto;
+    flex-direction: column;
     justify-content: center;
-    height: 100%;
     min-height: 0;
+}
+
+html {
+    height: 100%;
+}
+
+body {
+    font-family: "Cantarell", sans-serif;
+    position: relative;
+}
+
+[role="tooltip"] {
+    visibility: hidden;
+    position: absolute;
+    top: calc(100% + 10px);
+    right: 0;
+    background: black;
+    color: white;
+    padding: 0.5rem;
+    border-radius: 0.25rem;
+    /* Give some time before hiding so mouse can exit the input
+  and enter the tooltip */
+    transition: visibility 0.5s;
+    width: 250px;
+}
+[aria-describedby]:hover,
+[aria-describedby]:focus {
+    position: relative;
+}
+[aria-describedby]:hover > [role="tooltip"],
+[aria-describedby]:focus > [role="tooltip"],
+[role="tooltip"]:hover,
+[role="tooltip"]:focus {
+    visibility: visible;
 }

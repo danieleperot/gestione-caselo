@@ -1,8 +1,7 @@
 <script setup lang="ts">
 import { computed, ref } from "vue";
 import MonthCalendar from "./components/Calendar/MonthCalendar.vue";
-import HelloWorld from "./components/HelloWorld.vue";
-import AutoLogin from "./components/AutoLogin.vue";
+import SelectedDate from "./components/Calendar/SelectedDate.vue";
 
 interface ViewChangedPayload {
     month: {
@@ -33,16 +32,24 @@ const handleViewChanged = ({ month, range }: ViewChangedPayload): void => {
 </script>
 
 <template>
-    <main class="flex items-center justify-center grow shrink min-h-0">
-        <div>
-            <AutoLogin />
-            <HelloWorld />
-
+    <header />
+    <main class="md:flex md:items-center h-full py-4">
+        <div
+            class="md:flex content-center md:justify-center grow shrink min-h-0 md:w-full gap-12 md:p-6"
+        >
             <MonthCalendar
                 v-model="selected"
                 :minimum-date="minimumDateBeforeEvent"
+                class="grow md:max-w-xl justify-self-center w-full md:w-auto"
                 @view-changed="handleViewChanged"
+            />
+            <SelectedDate
+                v-if="selected"
+                :selected="selected"
+                class="grow md:max-w-xl fixed md:static bottom-0 left-0 right-0 bg-white w-full md:w-auto max-h-[80vh] overflow-y-auto"
+                @cancel="selected = null"
             />
         </div>
     </main>
+    <footer />
 </template>
