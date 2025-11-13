@@ -21,6 +21,7 @@ withDefaults(defineProps<Props>(), {
 <template>
     <div class="day-button w-10 h-10 shrink-0 flex items-center justify-center">
         <button
+            type="button"
             :disabled="disabled || selected"
             class="day-button__inner relative rounded-full w-full h-full transition duration-150 cursor-pointer disabled:cursor-default"
             :class="{
