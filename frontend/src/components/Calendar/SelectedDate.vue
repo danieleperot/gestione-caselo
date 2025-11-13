@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { computed, ref, watch } from "vue";
 import XMark from "../Icons/XMark.vue";
-import ChevronRight from "../Icons/ChevronRight.vue";
 
 const props = defineProps<{
     selected: Date;
@@ -51,9 +50,7 @@ watch(selectedIsoDate, () => {
 </script>
 
 <template>
-    <div
-        class="rounded-t-2xl md:rounded-b-2xl shadow border-2 border-purple-200"
-    >
+    <div class="rounded-t-2xl md:rounded-b-2xl border-2 border-slate-300">
         <div class="flex items-center justify-end">
             <button
                 aria-label="Scegli un'altra data"
@@ -75,7 +72,7 @@ watch(selectedIsoDate, () => {
                 <button
                     v-for="({ label, hint }, key) in slots"
                     :key="key"
-                    class="border border-slate-200 grid gap-0 shadow rounded-lg w-full p-2 hover:shadow-md transition-all cursor-pointer active:bg-purple-50"
+                    class="border-2 border-slate-200 grid gap-0 rounded-lg w-full p-2 hover:shadow-md transition-all cursor-pointer active:bg-purple-50"
                     :class="{
                         'bg-purple-200': selectedSlot === key,
                         'bg-white': selectedSlot !== key,
@@ -86,25 +83,6 @@ watch(selectedIsoDate, () => {
                     <div>{{ label }}</div>
                     <div class="text-xs">
                         {{ hint }}
-                    </div>
-                </button>
-            </div>
-            <div class="flex items-center justify-end">
-                <button
-                    class="flex items-center space-x-2 px-4 py-2 transition-all hover:shadow-md disabled:shadow-none active:bg-purple-200 disabled:text-slate-300 cursor-pointer disabled:cursor-not-allowed rounded-lg shadow border border-slate-200 relative"
-                    :aria-describedby="
-                        selectedSlot ? undefined : 'label-book-now-disabled'
-                    "
-                    :disabled="!selectedSlot"
-                >
-                    <div>Prenota ora</div>
-                    <ChevronRight />
-                    <div
-                        v-if="!selectedSlot"
-                        id="label-book-now-disabled"
-                        role="tooltip"
-                    >
-                        Seleziona la fascia oraria piú adatta al tuo evento
                     </div>
                 </button>
             </div>

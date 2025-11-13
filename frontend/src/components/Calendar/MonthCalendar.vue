@@ -222,11 +222,10 @@ const isBusy = (date: Date): boolean => {
 </script>
 
 <template>
-    <div
-        class="border-2 border-purple-200 p-4 rounded-2xl text-slate-900 shadow"
-    >
+    <div class="border-2 border-slate-300 p-4 rounded-2xl text-slate-900">
         <div class="flex items-center justify-between mb-6">
             <button
+                type="button"
                 :disabled="!canGoBack"
                 class="w-10 h-10 flex items-center justify-center disabled:text-slate-400 rounded-full bg-transparent cursor-pointer"
                 :class="{
@@ -241,6 +240,7 @@ const isBusy = (date: Date): boolean => {
                 {{ viewingMonthLabel }} {{ viewingYear }}
             </div>
             <button
+                type="button"
                 class="w-10 h-10 flex items-center justify-center disabled:text-slate-400 rounded-full bg-transparent hover:bg-slate-50 active:bg-slate-50 transition cursor-pointer"
                 @click="nextMonth(null)"
             >
