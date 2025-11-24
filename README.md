@@ -54,6 +54,8 @@ Access the application:
 - Backend API (EventForm): <http://localhost:8080>
 - ElasticMQ API (SQS): <http://localhost:9324>
 - ElasticMQ UI: <http://localhost:9325>
+- LocalStack (SES): <http://localhost:4566>
+- Mailpit UI (Email viewer): <http://localhost:8025>
 
 ### Development Workflow
 
