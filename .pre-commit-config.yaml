@@ -39,21 +39,21 @@ repos:
     rev: v1.62.2
     hooks:
       - id: golangci-lint
-        entry: bash -c 'cd backend && golangci-lint run --fix'
+        entry: bash -c 'for dir in backend/*/go.mod; do (cd $(dirname $dir) && golangci-lint run --fix); done'
         pass_filenames: false
 
   - repo: local
     hooks:
       - id: go-fmt
         name: go fmt
-        entry: bash -c 'cd backend && gofmt -w -s .'
+        entry: bash -c 'for dir in backend/*/go.mod; do (cd $(dirname $dir) && gofmt -w -s .); done'
         language: system
         files: \.go$
         pass_filenames: false
 
       - id: go-test
         name: go test
-        entry: bash -c 'cd backend && go test ./...'
+        entry: bash -c 'for dir in backend/*/go.mod; do (cd $(dirname $dir) && go test ./...); done'
         language: system
         files: \.go$
         pass_filenames: false

@@ -6,9 +6,12 @@ Booking system for Caselo di Salzan, a historic building used for events.
 
 Built on AWS serverless architecture with:
 
-- Go backend (Lambda + GraphQL)
+- Go backend (Multiple Lambda functions)
+  - EventForm: GraphQL API for bookings
+  - Emails: SQS-triggered email processing via SES
 - Vue 3 frontend (S3 + CloudFront)
 - DynamoDB single-table design
+- SQS message queue for async operations
 - Cognito authentication
 - Terraform infrastructure
 - GitHub Actions CI/CD
@@ -48,7 +51,9 @@ docker compose watch
 Access the application:
 
 - Frontend: <http://localhost:5173>
-- Backend API: <http://localhost:8080>
+- Backend API (EventForm): <http://localhost:8080>
+- ElasticMQ API (SQS): <http://localhost:9324>
+- ElasticMQ UI: <http://localhost:9325>
 
 ### Development Workflow
 
@@ -58,13 +63,16 @@ See [DEVELOPMENT_RULES.md](./DEVELOPMENT_RULES.md) for detailed development prac
 
 ```text
 gestione-caselo/
-├── backend/           # Go Lambda functions
+├── backend/
+│   ├── eventform/    # GraphQL API Lambda (bookings)
+│   └── emails/       # Email processing Lambda (SQS → SES)
 ├── frontend/          # Vue 3 application
 ├── terraform/         # Infrastructure as code
 ├── docs/
 │   └── adrs/         # Architecture Decision Records
 ├── .github/
 │   └── workflows/    # CI/CD pipelines
+├── elasticmq.conf    # Local SQS queue definitions
 └── docker-compose.yml
 ```
 

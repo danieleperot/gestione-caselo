@@ -30,6 +30,7 @@ Each ADR follows this structure:
 | [ADR-006](./ADR-006-use-vue3-with-static-site-generation.md) | Use Vue 3 with Static Site Generation | Accepted | 2025-10-21 |
 | [ADR-007](./ADR-007-use-terraform-for-infrastructure.md) | Use Terraform for Infrastructure as Code | Accepted | 2025-10-21 |
 | [ADR-008](./ADR-008-use-github-actions-for-cicd.md) | Use GitHub Actions for CI/CD | Accepted | 2025-10-21 |
+| [ADR-009](./ADR-009-use-sqs-for-async-email-processing.md) | Use SQS for Async Email Processing | Accepted | 2025-11-24 |
 
 ## Creating a New ADR
 
