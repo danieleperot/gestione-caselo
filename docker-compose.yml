@@ -28,8 +28,10 @@ services:
       - AWS_REGION=eu-south-1
       - AWS_ACCESS_KEY_ID=test
       - AWS_SECRET_ACCESS_KEY=test
+      - AWS_ENDPOINT_URL=http://localstack:4566
     depends_on:
       - elasticmq
+      - localstack
     volumes:
       - ./backend/emails:/app
     networks:
@@ -80,6 +82,28 @@ services:
     networks:
       - caselo-network
 
+  localstack:
+    image: localstack/localstack:latest
+    ports:
+      - "4566:4566"
+    environment:
+      - SERVICES=ses
+      - AWS_DEFAULT_REGION=eu-south-1
+      - DEBUG=1
+      - SMTP_HOST=mailpit:1025
+    volumes:
+      - localstack-data:/var/lib/localstack
+    networks:
+      - caselo-network
+
+  mailpit:
+    image: axllent/mailpit:latest
+    ports:
+      - "8025:8025"
+      - "1025:1025"
+    networks:
+      - caselo-network
+
 networks:
   caselo-network:
     driver: bridge
@@ -87,3 +111,4 @@ networks:
 volumes:
   pnpm-store:
   cognito-data:
+  localstack-data:
