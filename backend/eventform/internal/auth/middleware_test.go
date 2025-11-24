@@ -6,7 +6,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/daniele/gestione-caselo/internal/auth"
+	"github.com/daniele/gestione-caselo/backend/eventform/internal/auth"
 )
 
 func TestAuthMiddleware(t *testing.T) {

@@ -8,8 +8,8 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/daniele/gestione-caselo/internal/auth"
-	"github.com/daniele/gestione-caselo/internal/graphql/model"
+	"github.com/daniele/gestione-caselo/backend/eventform/internal/auth"
+	"github.com/daniele/gestione-caselo/backend/eventform/internal/graphql/model"
 )
 
 // Hello is the resolver for the hello field.

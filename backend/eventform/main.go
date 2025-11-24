@@ -10,8 +10,8 @@ import (
 	"github.com/99designs/gqlgen/graphql/playground"
 	"github.com/aws/aws-lambda-go/lambda"
 	"github.com/awslabs/aws-lambda-go-api-proxy/httpadapter"
-	"github.com/daniele/gestione-caselo/internal/auth"
-	"github.com/daniele/gestione-caselo/internal/graphql"
+	"github.com/daniele/gestione-caselo/backend/eventform/internal/auth"
+	"github.com/daniele/gestione-caselo/backend/eventform/internal/graphql"
 )
 
 func corsMiddleware(next http.Handler) http.Handler {

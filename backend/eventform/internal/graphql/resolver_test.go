@@ -4,8 +4,8 @@ import (
 	"context"
 	"testing"
 
-	"github.com/daniele/gestione-caselo/internal/auth"
-	"github.com/daniele/gestione-caselo/internal/graphql"
+	"github.com/daniele/gestione-caselo/backend/eventform/internal/auth"
+	"github.com/daniele/gestione-caselo/backend/eventform/internal/graphql"
 )
 
 func TestHelloQuery(t *testing.T) {

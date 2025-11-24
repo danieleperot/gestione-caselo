@@ -4,7 +4,7 @@ import (
 	"context"
 	"testing"
 
-	"github.com/daniele/gestione-caselo/internal/auth"
+	"github.com/daniele/gestione-caselo/backend/eventform/internal/auth"
 )
 
 func TestUserContext(t *testing.T) {

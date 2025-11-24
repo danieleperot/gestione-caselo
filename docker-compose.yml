@@ -1,10 +1,10 @@
 services:
-  backend:
-    build: ./backend
+  eventform:
+    build: ./backend/eventform
     ports:
       - "8080:8080"
     env_file:
-      - ./backend/.env
+      - ./backend/eventform/.env
     environment:
       - AWS_REGION=eu-south-1
       - AWS_ACCESS_KEY_ID=test
@@ -12,13 +12,32 @@ services:
     depends_on:
       - cognito-local
     volumes:
-      - ./backend:/app
+      - ./backend/eventform:/app
     networks:
       - caselo-network
     develop:
       watch:
         - action: rebuild
-          path: ./backend
+          path: ./backend/eventform
+
+  emails:
+    build: ./backend/emails
+    env_file:
+      - ./backend/emails/.env
+    environment:
+      - AWS_REGION=eu-south-1
+      - AWS_ACCESS_KEY_ID=test
+      - AWS_SECRET_ACCESS_KEY=test
+    depends_on:
+      - elasticmq
+    volumes:
+      - ./backend/emails:/app
+    networks:
+      - caselo-network
+    develop:
+      watch:
+        - action: rebuild
+          path: ./backend/emails
 
   frontend:
     build: ./frontend
@@ -48,6 +67,16 @@ services:
       - "9229:9229"
     volumes:
       - cognito-data:/app/.cognito
+    networks:
+      - caselo-network
+
+  elasticmq:
+    image: softwaremill/elasticmq-native:latest
+    ports:
+      - "9324:9324"
+      - "9325:9325"
+    volumes:
+      - ./elasticmq.conf:/opt/elasticmq.conf
     networks:
       - caselo-network
 
