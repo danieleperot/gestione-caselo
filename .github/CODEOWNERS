@@ -1,0 +1,14 @@
+# CODEOWNERS - Require approval from @danieleperot for infrastructure changes
+# https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners
+
+# Terraform infrastructure code
+/terraform/**               @danieleperot
+
+# GitHub Actions workflows
+/.github/workflows/**       @danieleperot
+
+# This file itself
+/.github/CODEOWNERS         @danieleperot
+
+# ADRs and documentation
+/docs/adrs/**              @danieleperot
