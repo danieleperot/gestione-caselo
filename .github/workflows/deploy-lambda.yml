@@ -1,0 +1,62 @@
+name: Deploy Lambda Functions
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'backend/**'
+      - '.github/workflows/deploy-lambda.yml'
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        lambda: [eventform, emails]
+        environment: [stage, prod]
+
+    # Require manual approval for production
+    environment: ${{ matrix.environment == 'prod' && 'production' || '' }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.25'
+
+      - name: Run tests
+        working-directory: backend/${{ matrix.lambda }}
+        run: go test ./...
+
+      - name: Build Lambda binary
+        working-directory: backend/${{ matrix.lambda }}
+        run: |
+          GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -tags lambda.norpc -o bootstrap
+          zip lambda.zip bootstrap
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/gestione-caselo-global-github-actions-app-${{ matrix.environment }}
+          aws-region: eu-south-1
+
+      - name: Update Lambda function code
+        run: |
+          aws lambda update-function-code \
+            --function-name gestione-caselo-${{ matrix.environment }}-${{ matrix.lambda }} \
+            --zip-file fileb://backend/${{ matrix.lambda }}/lambda.zip \
+            --publish
+
+      - name: Deployment summary
+        run: |
+          echo "✅ Lambda deployed successfully"
+          echo "Function: gestione-caselo-${{ matrix.environment }}-${{ matrix.lambda }}"
+          echo "Environment: ${{ matrix.environment }}"
+          echo "Deployer: ${{ github.actor }}"

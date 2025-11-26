@@ -89,7 +89,11 @@ The project uses pre-commit hooks to ensure code quality:
 
 ## Deployment
 
-Deployments are automated via GitHub Actions on push to `main` branch.
+### Infrastructure
+
+Infrastructure is managed via **Terraform** and deployed **manually** (for now!) by @danieleperot from local machine:
+
+See [terraform/README.md](./terraform/README.md) for detailed Terraform usage.
 
 ## License
 
