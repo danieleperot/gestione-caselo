@@ -4,91 +4,24 @@ Infrastructure as Code for Gestione Caselo.
 
 ## Architecture Overview
 
-```mermaid
-flowchart TB
-    subgraph Internet
-        User[User Browser]
-    end
+![AWS Architecture](gestione_caselo_architecture.png)
 
-    subgraph Route53["Route53"]
-        DNS[DNS: *.gestionecaselo.it]
-    end
+### Regenerate Diagram
 
-    subgraph CloudFront["CloudFront Distribution"]
-        CF[CDN + SSL Certificate]
-    end
+To update the diagram after infrastructure changes:
 
-    subgraph S3Frontend["S3 Bucket"]
-        S3[Frontend Static Files<br/>Vue.js SPA]
-    end
-
-    subgraph APIGateway["API Gateway HTTP"]
-        APIGW[POST /graphql]
-    end
-
-    subgraph Lambda["Lambda Functions"]
-        EventForm[EventForm Lambda<br/>GraphQL API<br/>Go Runtime]
-        Emails[Emails Lambda<br/>Email Sender<br/>Go Runtime]
-    end
-
-    subgraph DynamoDB["DynamoDB"]
-        DB[(Single Table<br/>PAY_PER_REQUEST)]
-    end
-
-    subgraph SQS["SQS Queues"]
-        EmailsQueue[Emails Queue]
-        EmailsDLQ[Emails DLQ]
-    end
-
-    subgraph SES["Simple Email Service"]
-        EmailService[SES Email Delivery]
-    end
-
-    subgraph CloudWatch["CloudWatch"]
-        Logs[Log Groups]
-        Alarms[Alarms & Metrics]
-    end
-
-    subgraph Global["Global Resources"]
-        OIDC[GitHub OIDC Provider]
-        IAM[IAM Roles for CI/CD]
-        Budget[Budget Alerts]
-        ArtifactsS3[Lambda Artifacts S3]
-    end
-
-    User -->|HTTPS| DNS
-    DNS -->|Routes to| CF
-    CF -->|Serves| S3
-    User -->|GraphQL API Calls| APIGW
-    APIGW -->|Invokes| EventForm
-    EventForm -->|Read/Write| DB
-    EventForm -->|Enqueue| EmailsQueue
-    EmailsQueue -->|Triggers| Emails
-    EmailsQueue -.->|Failed Messages| EmailsDLQ
-    Emails -->|Send Email| EmailService
-    EventForm -.->|Logs| Logs
-    Emails -.->|Logs| Logs
-    Logs -.->|Trigger| Alarms
-    IAM -.->|Deploy| EventForm
-    IAM -.->|Deploy| Emails
-    IAM -.->|Upload| S3
-    OIDC -.->|Authenticates| IAM
-
-    style User fill:#e1f5ff
-    style CF fill:#ff9900
-    style S3 fill:#ff9900
-    style APIGW fill:#ff9900
-    style EventForm fill:#ff9900
-    style Emails fill:#ff9900
-    style DB fill:#ff9900
-    style EmailsQueue fill:#ff9900
-    style EmailsDLQ fill:#ff9900
-    style EmailService fill:#ff9900
-    style DNS fill:#ff9900
-    style Logs fill:#ff9900
-    style OIDC fill:#ff9900
-    style IAM fill:#ff9900
+```bash
+cd terraform
+.venv/bin/python generate_diagram.py
 ```
+
+The diagram shows:
+
+- **Frontend**: Route53 → CloudFront → S3 (Vue.js SPA)
+- **API**: API Gateway → EventForm Lambda → DynamoDB
+- **Email Processing**: EventForm → SQS Queue → Emails Lambda → SES
+- **CI/CD**: GitHub Actions → OIDC → IAM → Lambda/S3 deployments
+- **Observability**: CloudWatch logs and alarms
 
 ## Deployment Strategy
 

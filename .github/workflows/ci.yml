@@ -132,7 +132,23 @@ jobs:
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
         with:
-          terraform_version: '~1.9'
+          terraform_version: '~1.11'
+
+      - name: Install terraform-docs
+        run: |
+          curl -sSLo ./terraform-docs.tar.gz https://github.com/terraform-docs/terraform-docs/releases/download/v0.19.0/terraform-docs-v0.19.0-linux-amd64.tar.gz
+          tar -xzf terraform-docs.tar.gz
+          chmod +x terraform-docs
+          sudo mv terraform-docs /usr/local/bin/
+          terraform-docs --version
+
+      - name: Install tflint
+        run: |
+          curl -sSLo ./tflint.zip https://github.com/terraform-linters/tflint/releases/download/v0.54.0/tflint_linux_amd64.zip
+          unzip tflint.zip
+          chmod +x tflint
+          sudo mv tflint /usr/local/bin/
+          tflint --version
 
       - name: Install pre-commit
         run: pip install pre-commit
