@@ -103,7 +103,10 @@ resource "aws_iam_role" "github_actions_app_prod" {
             "token.actions.githubusercontent.com:aud" = "sts.amazonaws.com"
           }
           StringLike = {
-            "token.actions.githubusercontent.com:sub" = "repo:${local.github_repo}:ref:refs/heads/main"
+            "token.actions.githubusercontent.com:sub" = [
+              "repo:${local.github_repo}:ref:refs/heads/main",
+              "repo:${local.github_repo}:environment:production"
+            ]
           }
         }
       }
@@ -216,7 +219,10 @@ resource "aws_iam_role" "github_actions_frontend_prod" {
             "token.actions.githubusercontent.com:aud" = "sts.amazonaws.com"
           }
           StringLike = {
-            "token.actions.githubusercontent.com:sub" = "repo:${local.github_repo}:ref:refs/heads/main"
+            "token.actions.githubusercontent.com:sub" = [
+              "repo:${local.github_repo}:ref:refs/heads/main",
+              "repo:${local.github_repo}:environment:production"
+            ]
           }
         }
       }
