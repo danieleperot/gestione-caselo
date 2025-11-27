@@ -22,24 +22,35 @@ services:
 
   emails:
     build: ./backend/emails
-    env_file:
-      - ./backend/emails/.env
     environment:
       - AWS_REGION=eu-south-1
       - AWS_ACCESS_KEY_ID=test
       - AWS_SECRET_ACCESS_KEY=test
       - AWS_ENDPOINT_URL=http://localstack:4566
+      - ADMIN_EMAILS=admin@local.test,manager@local.test
+      - FROM_ADDRESS=noreply@local.test
     depends_on:
-      - elasticmq
       - localstack
+    networks:
+      - caselo-network
+
+  emails-poller:
+    build:
+      context: ./backend/emails
+      dockerfile: cmd/poller/Dockerfile
+    environment:
+      - AWS_REGION=eu-south-1
+      - AWS_ACCESS_KEY_ID=test
+      - AWS_SECRET_ACCESS_KEY=test
+      - SQS_QUEUE_URL=http://elasticmq:9324/000000000000/emails
+      - LAMBDA_URL=http://emails:8080/2015-03-31/functions/function/invocations
+    depends_on:
+      - emails
+      - elasticmq
     volumes:
       - ./backend/emails:/app
     networks:
       - caselo-network
-    develop:
-      watch:
-        - action: rebuild
-          path: ./backend/emails
 
   frontend:
     build: ./frontend
@@ -91,6 +102,7 @@ services:
       - AWS_DEFAULT_REGION=eu-south-1
       - DEBUG=1
       - SMTP_HOST=mailpit:1025
+      - SES_AUTO_VERIFY_IDENTITIES=1
     volumes:
       - localstack-data:/var/lib/localstack
     networks:

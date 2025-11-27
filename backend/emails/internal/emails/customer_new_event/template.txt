@@ -1,0 +1,9 @@
+Event Submission Confirmed
+
+Thank you for submitting your event request!
+
+Event ID: {{.eventId}}
+Date: {{.eventDate}}
+Type: {{.eventType}}
+
+We will review your request and contact you shortly.
