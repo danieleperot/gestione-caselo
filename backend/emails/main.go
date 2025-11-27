@@ -2,39 +2,64 @@ package main
 
 import (
 	"context"
-	"fmt"
+	"log"
+	"os"
+	"strings"
 
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"
 	"github.com/aws/aws-sdk-go-v2/config"
 	"github.com/aws/aws-sdk-go-v2/service/ses"
+	"github.com/daniele/gestione-caselo/backend/emails/internal/emails/admin_new_event"
+	"github.com/daniele/gestione-caselo/backend/emails/internal/emails/customer_new_event"
+	"github.com/daniele/gestione-caselo/backend/emails/internal/handler"
+	"github.com/daniele/gestione-caselo/backend/emails/internal/mailer"
+	"github.com/daniele/gestione-caselo/backend/emails/internal/message"
+	"github.com/daniele/gestione-caselo/backend/emails/internal/registry"
 )
 
-// handler processes SQS messages and sends emails via SES
-func handler(ctx context.Context, sqsEvent events.SQSEvent) error {
-	// Load AWS SDK configuration
+var h *handler.Handler
+
+func init() {
+	ctx := context.Background()
+
+	adminEmailsStr := os.Getenv("ADMIN_EMAILS")
+	if adminEmailsStr == "" {
+		log.Fatal("ADMIN_EMAILS environment variable is required")
+	}
+	adminEmails := strings.Split(adminEmailsStr, ",")
+	for i, email := range adminEmails {
+		adminEmails[i] = strings.TrimSpace(email)
+	}
+
+	fromAddr := os.Getenv("FROM_ADDRESS")
+	if fromAddr == "" {
+		fromAddr = "noreply@gestione-caselo.it"
+	}
+
 	cfg, err := config.LoadDefaultConfig(ctx)
 	if err != nil {
-		return fmt.Errorf("failed to load AWS config: %w", err)
+		log.Fatalf("Failed to load AWS config: %v", err)
 	}
 
 	sesClient := ses.NewFromConfig(cfg)
+	m := mailer.New(sesClient)
 
-	for _, message := range sqsEvent.Records {
-		fmt.Printf("Processing message ID: %s\n", message.MessageId)
-		fmt.Printf("Message body: %s\n", message.Body)
+	reg := registry.New()
+	reg.Register("admin_new_event", func(metadata map[string]interface{}) (message.EmailMessage, error) {
+		return admin_new_event.New(metadata, adminEmails)
+	})
+	reg.Register("customer_new_event", func(metadata map[string]interface{}) (message.EmailMessage, error) {
+		return customer_new_event.New(metadata)
+	})
 
-		// TODO: Parse message body into email struct
-		// TODO: Validate email parameters
-		// TODO: Call sesClient.SendEmail() with proper parameters
-		// TODO: Handle SES errors and implement retry logic
+	h = handler.New(reg, m, fromAddr)
+}
 
-		_ = sesClient // Suppress unused variable warning for now
-	}
-
-	return nil
+func handleRequest(ctx context.Context, sqsEvent events.SQSEvent) error {
+	return h.ProcessSQSEvent(ctx, sqsEvent)
 }
 
 func main() {
-	lambda.Start(handler)
+	lambda.Start(handleRequest)
 }

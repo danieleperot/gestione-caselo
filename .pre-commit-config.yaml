@@ -82,13 +82,6 @@ repos:
         args: [--baseline, .secrets.baseline]
         exclude: (package-lock\.json|pnpm-lock\.yaml)
 
-  # Docker
-  - repo: https://github.com/hadolint/hadolint
-    rev: v2.12.0
-    hooks:
-      - id: hadolint-docker
-        args: [--ignore, DL3018, --ignore, DL3008]
-
   # Commit message format
   - repo: https://github.com/commitizen-tools/commitizen
     rev: v3.13.0

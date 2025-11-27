@@ -1,0 +1,10 @@
+New Event Request
+
+A new event has been submitted and requires review:
+
+Event ID: {{.eventId}}
+Customer: {{.userName}}
+Date: {{.eventDate}}
+Type: {{.eventType}}
+
+Please log in to the admin panel to review this event.
