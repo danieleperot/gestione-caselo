@@ -3,7 +3,6 @@ package main
 import (
 	"context"
 	"log"
-	"os"
 	"strings"
 
 	"github.com/aws/aws-lambda-go/events"
@@ -16,6 +15,7 @@ import (
 	"github.com/daniele/gestione-caselo/backend/emails/internal/mailer"
 	"github.com/daniele/gestione-caselo/backend/emails/internal/message"
 	"github.com/daniele/gestione-caselo/backend/emails/internal/registry"
+	appconfig "github.com/daniele/gestione-caselo/backend/internal/config"
 )
 
 var h *handler.Handler
@@ -23,16 +23,16 @@ var h *handler.Handler
 func init() {
 	ctx := context.Background()
 
-	adminEmailsStr := os.Getenv("ADMIN_EMAILS")
+	adminEmailsStr := appconfig.GetEnvVariable("ADMIN_EMAILS")
 	if adminEmailsStr == "" {
-		log.Fatal("ADMIN_EMAILS environment variable is required")
+		log.Fatal("ADMIN_EMAILS is required")
 	}
 	adminEmails := strings.Split(adminEmailsStr, ",")
 	for i, email := range adminEmails {
 		adminEmails[i] = strings.TrimSpace(email)
 	}
 
-	fromAddr := os.Getenv("FROM_ADDRESS")
+	fromAddr := appconfig.GetEnvVariable("FROM_ADDRESS")
 	if fromAddr == "" {
 		fromAddr = "noreply@gestione-caselo.it"
 	}

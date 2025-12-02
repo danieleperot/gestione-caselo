@@ -1,6 +1,8 @@
 services:
   eventform:
-    build: ./backend/eventform
+    build:
+      context: ./backend
+      dockerfile: eventform/Dockerfile
     ports:
       - "8080:8080"
     env_file:
@@ -21,7 +23,9 @@ services:
           path: ./backend/eventform
 
   emails:
-    build: ./backend/emails
+    build:
+      context: ./backend
+      dockerfile: emails/Dockerfile
     environment:
       - AWS_REGION=eu-south-1
       - AWS_ACCESS_KEY_ID=test
@@ -94,7 +98,7 @@ services:
     ports:
       - "4566:4566"
     environment:
-      - SERVICES=ses
+      - SERVICES=ses,ssm
       - AWS_DEFAULT_REGION=eu-south-1
       - DEBUG=1
     volumes:
