@@ -58,6 +58,37 @@ resource "aws_iam_role_policy" "eventform_dynamodb" {
   })
 }
 
+resource "aws_iam_role_policy" "eventform_ssm" {
+  name = "ssm-read"
+  role = aws_iam_role.eventform.id
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Action = [
+          "ssm:GetParameter",
+          "ssm:GetParameters"
+        ]
+        Resource = "arn:aws:ssm:${var.region}:*:parameter/gestione-caselo/${var.environment}/*"
+      },
+      {
+        Effect = "Allow"
+        Action = [
+          "kms:Decrypt"
+        ]
+        Resource = "arn:aws:kms:${var.region}:*:key/*"
+        Condition = {
+          StringEquals = {
+            "kms:ViaService" = "ssm.${var.region}.amazonaws.com"
+          }
+        }
+      }
+    ]
+  })
+}
+
 # IAM role for emails Lambda
 resource "aws_iam_role" "emails" {
   name = "${local.prefix}-emails"
@@ -109,6 +140,37 @@ resource "aws_iam_role_policy" "emails_sqs_ses" {
           "ses:SendRawEmail"
         ]
         Resource = "*"
+      }
+    ]
+  })
+}
+
+resource "aws_iam_role_policy" "emails_ssm" {
+  name = "ssm-read"
+  role = aws_iam_role.emails.id
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Action = [
+          "ssm:GetParameter",
+          "ssm:GetParameters"
+        ]
+        Resource = "arn:aws:ssm:${var.region}:*:parameter/gestione-caselo/${var.environment}/*"
+      },
+      {
+        Effect = "Allow"
+        Action = [
+          "kms:Decrypt"
+        ]
+        Resource = "arn:aws:kms:${var.region}:*:key/*"
+        Condition = {
+          StringEquals = {
+            "kms:ViaService" = "ssm.${var.region}.amazonaws.com"
+          }
+        }
       }
     ]
   })
