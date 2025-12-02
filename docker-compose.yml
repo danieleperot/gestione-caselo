@@ -35,9 +35,7 @@ services:
       - caselo-network
 
   emails-poller:
-    build:
-      context: ./backend/emails
-      dockerfile: cmd/poller/Dockerfile
+    build: ./local/email-poller
     environment:
       - AWS_REGION=eu-south-1
       - AWS_ACCESS_KEY_ID=test
@@ -47,8 +45,6 @@ services:
     depends_on:
       - emails
       - elasticmq
-    volumes:
-      - ./backend/emails:/app
     networks:
       - caselo-network
 
