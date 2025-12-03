@@ -38,6 +38,7 @@ type Config struct {
 }
 
 type ResolverRoot interface {
+	Mutation() MutationResolver
 	Query() QueryResolver
 }
 
@@ -45,8 +46,17 @@ type DirectiveRoot struct {
 }
 
 type ComplexityRoot struct {
+	EventBookingResponse struct {
+		Message func(childComplexity int) int
+		Success func(childComplexity int) int
+	}
+
 	HelloResponse struct {
 		Message func(childComplexity int) int
+	}
+
+	Mutation struct {
+		SubmitEventBooking func(childComplexity int, input model.EventBookingInput) int
 	}
 
 	Query struct {
@@ -54,6 +64,9 @@ type ComplexityRoot struct {
 	}
 }
 
+type MutationResolver interface {
+	SubmitEventBooking(ctx context.Context, input model.EventBookingInput) (*model.EventBookingResponse, error)
+}
 type QueryResolver interface {
 	Hello(ctx context.Context) (*model.HelloResponse, error)
 }
@@ -77,12 +90,37 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 	_ = ec
 	switch typeName + "." + field {
 
+	case "EventBookingResponse.message":
+		if e.complexity.EventBookingResponse.Message == nil {
+			break
+		}
+
+		return e.complexity.EventBookingResponse.Message(childComplexity), true
+	case "EventBookingResponse.success":
+		if e.complexity.EventBookingResponse.Success == nil {
+			break
+		}
+
+		return e.complexity.EventBookingResponse.Success(childComplexity), true
+
 	case "HelloResponse.message":
 		if e.complexity.HelloResponse.Message == nil {
 			break
 		}
 
 		return e.complexity.HelloResponse.Message(childComplexity), true
+
+	case "Mutation.submitEventBooking":
+		if e.complexity.Mutation.SubmitEventBooking == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_submitEventBooking_args(ctx, rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.SubmitEventBooking(childComplexity, args["input"].(model.EventBookingInput)), true
 
 	case "Query.hello":
 		if e.complexity.Query.Hello == nil {
@@ -98,7 +136,9 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 func (e *executableSchema) Exec(ctx context.Context) graphql.ResponseHandler {
 	opCtx := graphql.GetOperationContext(ctx)
 	ec := executionContext{opCtx, e, 0, 0, make(chan graphql.DeferredResult)}
-	inputUnmarshalMap := graphql.BuildUnmarshalerMap()
+	inputUnmarshalMap := graphql.BuildUnmarshalerMap(
+		ec.unmarshalInputEventBookingInput,
+	)
 	first := true
 
 	switch opCtx.Operation.Operation {
@@ -131,6 +171,21 @@ func (e *executableSchema) Exec(ctx context.Context) graphql.ResponseHandler {
 			}
 
 			return &response
+		}
+	case ast.Mutation:
+		return func(ctx context.Context) *graphql.Response {
+			if !first {
+				return nil
+			}
+			first = false
+			ctx = graphql.WithUnmarshalerMap(ctx, inputUnmarshalMap)
+			data := ec._Mutation(ctx, opCtx.Operation.SelectionSet)
+			var buf bytes.Buffer
+			data.MarshalGQL(&buf)
+
+			return &graphql.Response{
+				Data: buf.Bytes(),
+			}
 		}
 
 	default:
@@ -184,8 +239,27 @@ var sources = []*ast.Source{
     hello: HelloResponse!
 }
 
+type Mutation {
+    submitEventBooking(input: EventBookingInput!): EventBookingResponse!
+}
+
 type HelloResponse {
     message: String!
+}
+
+type EventBookingResponse {
+    success: Boolean!
+    message: String!
+}
+
+input EventBookingInput {
+    fullName: String!
+    association: String
+    email: String!
+    phone: String!
+    description: String!
+    date: String!
+    acceptData: Boolean!
 }
 `, BuiltIn: false},
 }
@@ -194,6 +268,17 @@ var parsedSchema = gqlparser.MustLoadSchema(sources...)
 // endregion ************************** generated!.gotpl **************************
 
 // region    ***************************** args.gotpl *****************************
+
+func (ec *executionContext) field_Mutation_submitEventBooking_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := graphql.ProcessArgField(ctx, rawArgs, "input", ec.unmarshalNEventBookingInput2githubᚗcomᚋdanieleᚋgestioneᚑcaseloᚋbackendᚋeventformᚋinternalᚋgraphqlᚋmodelᚐEventBookingInput)
+	if err != nil {
+		return nil, err
+	}
+	args["input"] = arg0
+	return args, nil
+}
 
 func (ec *executionContext) field_Query___type_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
 	var err error
@@ -258,6 +343,64 @@ func (ec *executionContext) field___Type_fields_args(ctx context.Context, rawArg
 
 // region    **************************** field.gotpl *****************************
 
+func (ec *executionContext) _EventBookingResponse_success(ctx context.Context, field graphql.CollectedField, obj *model.EventBookingResponse) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_EventBookingResponse_success,
+		func(ctx context.Context) (any, error) {
+			return obj.Success, nil
+		},
+		nil,
+		ec.marshalNBoolean2bool,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_EventBookingResponse_success(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "EventBookingResponse",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Boolean does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _EventBookingResponse_message(ctx context.Context, field graphql.CollectedField, obj *model.EventBookingResponse) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_EventBookingResponse_message,
+		func(ctx context.Context) (any, error) {
+			return obj.Message, nil
+		},
+		nil,
+		ec.marshalNString2string,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_EventBookingResponse_message(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "EventBookingResponse",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _HelloResponse_message(ctx context.Context, field graphql.CollectedField, obj *model.HelloResponse) (ret graphql.Marshaler) {
 	return graphql.ResolveField(
 		ctx,
@@ -287,6 +430,53 @@ func (ec *executionContext) fieldContext_HelloResponse_message(_ context.Context
 	return fc, nil
 }
 
+func (ec *executionContext) _Mutation_submitEventBooking(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Mutation_submitEventBooking,
+		func(ctx context.Context) (any, error) {
+			fc := graphql.GetFieldContext(ctx)
+			return ec.resolvers.Mutation().SubmitEventBooking(ctx, fc.Args["input"].(model.EventBookingInput))
+		},
+		nil,
+		ec.marshalNEventBookingResponse2ᚖgithubᚗcomᚋdanieleᚋgestioneᚑcaseloᚋbackendᚋeventformᚋinternalᚋgraphqlᚋmodelᚐEventBookingResponse,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_Mutation_submitEventBooking(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "success":
+				return ec.fieldContext_EventBookingResponse_success(ctx, field)
+			case "message":
+				return ec.fieldContext_EventBookingResponse_message(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type EventBookingResponse", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_submitEventBooking_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _Query_hello(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	return graphql.ResolveField(
 		ctx,
@@ -297,7 +487,7 @@ func (ec *executionContext) _Query_hello(ctx context.Context, field graphql.Coll
 			return ec.resolvers.Query().Hello(ctx)
 		},
 		nil,
-		ec.marshalNHelloResponse2ᚖgithubᚗcomᚋdanieleᚋgestioneᚑcaseloᚋinternalᚋgraphqlᚋmodelᚐHelloResponse,
+		ec.marshalNHelloResponse2ᚖgithubᚗcomᚋdanieleᚋgestioneᚑcaseloᚋbackendᚋeventformᚋinternalᚋgraphqlᚋmodelᚐHelloResponse,
 		true,
 		true,
 	)
@@ -1874,6 +2064,75 @@ func (ec *executionContext) fieldContext___Type_isOneOf(_ context.Context, field
 
 // region    **************************** input.gotpl *****************************
 
+func (ec *executionContext) unmarshalInputEventBookingInput(ctx context.Context, obj any) (model.EventBookingInput, error) {
+	var it model.EventBookingInput
+	asMap := map[string]any{}
+	for k, v := range obj.(map[string]any) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"fullName", "association", "email", "phone", "description", "date", "acceptData"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "fullName":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("fullName"))
+			data, err := ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.FullName = data
+		case "association":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("association"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Association = data
+		case "email":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("email"))
+			data, err := ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Email = data
+		case "phone":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("phone"))
+			data, err := ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Phone = data
+		case "description":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("description"))
+			data, err := ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Description = data
+		case "date":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("date"))
+			data, err := ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Date = data
+		case "acceptData":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("acceptData"))
+			data, err := ec.unmarshalNBoolean2bool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.AcceptData = data
+		}
+	}
+
+	return it, nil
+}
+
 // endregion **************************** input.gotpl *****************************
 
 // region    ************************** interface.gotpl ***************************
@@ -1881,6 +2140,50 @@ func (ec *executionContext) fieldContext___Type_isOneOf(_ context.Context, field
 // endregion ************************** interface.gotpl ***************************
 
 // region    **************************** object.gotpl ****************************
+
+var eventBookingResponseImplementors = []string{"EventBookingResponse"}
+
+func (ec *executionContext) _EventBookingResponse(ctx context.Context, sel ast.SelectionSet, obj *model.EventBookingResponse) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, eventBookingResponseImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("EventBookingResponse")
+		case "success":
+			out.Values[i] = ec._EventBookingResponse_success(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "message":
+			out.Values[i] = ec._EventBookingResponse_message(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
 
 var helloResponseImplementors = []string{"HelloResponse"}
 
@@ -1895,6 +2198,55 @@ func (ec *executionContext) _HelloResponse(ctx context.Context, sel ast.Selectio
 			out.Values[i] = graphql.MarshalString("HelloResponse")
 		case "message":
 			out.Values[i] = ec._HelloResponse_message(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
+var mutationImplementors = []string{"Mutation"}
+
+func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, mutationImplementors)
+	ctx = graphql.WithFieldContext(ctx, &graphql.FieldContext{
+		Object: "Mutation",
+	})
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		innerCtx := graphql.WithRootFieldContext(ctx, &graphql.RootFieldContext{
+			Object: field.Name,
+			Field:  field,
+		})
+
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("Mutation")
+		case "submitEventBooking":
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_submitEventBooking(ctx, field)
+			})
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
@@ -2338,20 +2690,39 @@ func (ec *executionContext) marshalNBoolean2bool(ctx context.Context, sel ast.Se
 	res := graphql.MarshalBoolean(v)
 	if res == graphql.Null {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
-			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+			graphql.AddErrorf(ctx, "the requested element is null which the schema does not allow")
 		}
 	}
 	return res
 }
 
-func (ec *executionContext) marshalNHelloResponse2githubᚗcomᚋdanieleᚋgestioneᚑcaseloᚋinternalᚋgraphqlᚋmodelᚐHelloResponse(ctx context.Context, sel ast.SelectionSet, v model.HelloResponse) graphql.Marshaler {
+func (ec *executionContext) unmarshalNEventBookingInput2githubᚗcomᚋdanieleᚋgestioneᚑcaseloᚋbackendᚋeventformᚋinternalᚋgraphqlᚋmodelᚐEventBookingInput(ctx context.Context, v any) (model.EventBookingInput, error) {
+	res, err := ec.unmarshalInputEventBookingInput(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalNEventBookingResponse2githubᚗcomᚋdanieleᚋgestioneᚑcaseloᚋbackendᚋeventformᚋinternalᚋgraphqlᚋmodelᚐEventBookingResponse(ctx context.Context, sel ast.SelectionSet, v model.EventBookingResponse) graphql.Marshaler {
+	return ec._EventBookingResponse(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNEventBookingResponse2ᚖgithubᚗcomᚋdanieleᚋgestioneᚑcaseloᚋbackendᚋeventformᚋinternalᚋgraphqlᚋmodelᚐEventBookingResponse(ctx context.Context, sel ast.SelectionSet, v *model.EventBookingResponse) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			graphql.AddErrorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._EventBookingResponse(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalNHelloResponse2githubᚗcomᚋdanieleᚋgestioneᚑcaseloᚋbackendᚋeventformᚋinternalᚋgraphqlᚋmodelᚐHelloResponse(ctx context.Context, sel ast.SelectionSet, v model.HelloResponse) graphql.Marshaler {
 	return ec._HelloResponse(ctx, sel, &v)
 }
 
-func (ec *executionContext) marshalNHelloResponse2ᚖgithubᚗcomᚋdanieleᚋgestioneᚑcaseloᚋinternalᚋgraphqlᚋmodelᚐHelloResponse(ctx context.Context, sel ast.SelectionSet, v *model.HelloResponse) graphql.Marshaler {
+func (ec *executionContext) marshalNHelloResponse2ᚖgithubᚗcomᚋdanieleᚋgestioneᚑcaseloᚋbackendᚋeventformᚋinternalᚋgraphqlᚋmodelᚐHelloResponse(ctx context.Context, sel ast.SelectionSet, v *model.HelloResponse) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
-			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+			graphql.AddErrorf(ctx, "the requested element is null which the schema does not allow")
 		}
 		return graphql.Null
 	}
@@ -2368,7 +2739,7 @@ func (ec *executionContext) marshalNString2string(ctx context.Context, sel ast.S
 	res := graphql.MarshalString(v)
 	if res == graphql.Null {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
-			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+			graphql.AddErrorf(ctx, "the requested element is null which the schema does not allow")
 		}
 	}
 	return res
@@ -2432,7 +2803,7 @@ func (ec *executionContext) marshalN__DirectiveLocation2string(ctx context.Conte
 	res := graphql.MarshalString(v)
 	if res == graphql.Null {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
-			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+			graphql.AddErrorf(ctx, "the requested element is null which the schema does not allow")
 		}
 	}
 	return res
@@ -2604,7 +2975,7 @@ func (ec *executionContext) marshalN__Type2ᚕgithubᚗcomᚋ99designsᚋgqlgen�
 func (ec *executionContext) marshalN__Type2ᚖgithubᚗcomᚋ99designsᚋgqlgenᚋgraphqlᚋintrospectionᚐType(ctx context.Context, sel ast.SelectionSet, v *introspection.Type) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
-			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+			graphql.AddErrorf(ctx, "the requested element is null which the schema does not allow")
 		}
 		return graphql.Null
 	}
@@ -2621,7 +2992,7 @@ func (ec *executionContext) marshalN__TypeKind2string(ctx context.Context, sel a
 	res := graphql.MarshalString(v)
 	if res == graphql.Null {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
-			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+			graphql.AddErrorf(ctx, "the requested element is null which the schema does not allow")
 		}
 	}
 	return res
