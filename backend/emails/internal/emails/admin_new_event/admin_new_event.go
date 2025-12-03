@@ -40,6 +40,11 @@ func (e *AdminNewEvent) Subject() string {
 	return "Nuova Richiesta Evento"
 }
 
+func (e *AdminNewEvent) ReplyTo() []string {
+	customerEmail := e.metadata["customerEmail"].(string)
+	return []string{customerEmail}
+}
+
 func (e *AdminNewEvent) Render() (string, error) {
 	return emails.RenderTemplate("admin_new_event", templateContent, e.metadata)
 }

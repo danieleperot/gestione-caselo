@@ -25,6 +25,10 @@ func (m *mockEmailMessage) Render() (string, error) {
 	return m.body, nil
 }
 
+func (m *mockEmailMessage) ReplyTo() []string {
+	return nil
+}
+
 func TestRegistry_Register(t *testing.T) {
 	r := New()
 

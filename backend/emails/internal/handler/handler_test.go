@@ -18,11 +18,11 @@ func (m *mockRegistry) Get(sqsMessageBody string) (message.EmailMessage, error) 
 }
 
 type mockMailer struct {
-	sendEmailFunc func(ctx context.Context, from string, to []string, subject, body string) error
+	sendEmailFunc func(ctx context.Context, from string, to []string, subject, body string, replyTo []string) error
 }
 
-func (m *mockMailer) SendEmail(ctx context.Context, from string, to []string, subject, body string) error {
-	return m.sendEmailFunc(ctx, from, to, subject, body)
+func (m *mockMailer) SendEmail(ctx context.Context, from string, to []string, subject, body string, replyTo []string) error {
+	return m.sendEmailFunc(ctx, from, to, subject, body, replyTo)
 }
 
 type mockEmailMessage struct {
@@ -43,6 +43,10 @@ func (m *mockEmailMessage) Render() (string, error) {
 	return m.body, nil
 }
 
+func (m *mockEmailMessage) ReplyTo() []string {
+	return nil
+}
+
 func TestProcessSQSEvent_Success(t *testing.T) {
 	var capturedFrom string
 	var capturedTo []string
@@ -60,7 +64,7 @@ func TestProcessSQSEvent_Success(t *testing.T) {
 	}
 
 	mockMail := &mockMailer{
-		sendEmailFunc: func(ctx context.Context, from string, to []string, subject, body string) error {
+		sendEmailFunc: func(ctx context.Context, from string, to []string, subject, body string, replyTo []string) error {
 			capturedFrom = from
 			capturedTo = to
 			capturedSubject = subject
@@ -116,7 +120,7 @@ func TestProcessSQSEvent_MultipleMessages(t *testing.T) {
 	}
 
 	mockMail := &mockMailer{
-		sendEmailFunc: func(ctx context.Context, from string, to []string, subject, body string) error {
+		sendEmailFunc: func(ctx context.Context, from string, to []string, subject, body string, replyTo []string) error {
 			processedCount++
 			return nil
 		},
@@ -150,7 +154,7 @@ func TestProcessSQSEvent_RegistryError(t *testing.T) {
 	}
 
 	mockMail := &mockMailer{
-		sendEmailFunc: func(ctx context.Context, from string, to []string, subject, body string) error {
+		sendEmailFunc: func(ctx context.Context, from string, to []string, subject, body string, replyTo []string) error {
 			return nil
 		},
 	}
@@ -181,7 +185,7 @@ func TestProcessSQSEvent_MailerError(t *testing.T) {
 	}
 
 	mockMail := &mockMailer{
-		sendEmailFunc: func(ctx context.Context, from string, to []string, subject, body string) error {
+		sendEmailFunc: func(ctx context.Context, from string, to []string, subject, body string, replyTo []string) error {
 			return fmt.Errorf("SES error")
 		},
 	}

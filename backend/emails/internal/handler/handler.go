@@ -14,7 +14,7 @@ type Registry interface {
 }
 
 type Mailer interface {
-	SendEmail(ctx context.Context, from string, to []string, subject, body string) error
+	SendEmail(ctx context.Context, from string, to []string, subject, body string, replyTo []string) error
 }
 
 type Handler struct {
@@ -58,8 +58,9 @@ func (h *Handler) processMessage(ctx context.Context, record events.SQSMessage) 
 	}
 
 	subject := emailMsg.Subject()
+	replyTo := emailMsg.ReplyTo()
 
-	if err := h.mailer.SendEmail(ctx, h.fromAddr, recipients, subject, body); err != nil {
+	if err := h.mailer.SendEmail(ctx, h.fromAddr, recipients, subject, body, replyTo); err != nil {
 		return fmt.Errorf("failed to send email: %w", err)
 	}
 

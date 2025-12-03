@@ -40,6 +40,10 @@ func (e *CustomerNewEvent) Subject() string {
 	return "Richiesta Evento Confermata"
 }
 
+func (e *CustomerNewEvent) ReplyTo() []string {
+	return nil
+}
+
 func (e *CustomerNewEvent) Render() (string, error) {
 	return emails.RenderTemplate("customer_new_event", templateContent, e.metadata)
 }

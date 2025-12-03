@@ -33,6 +33,7 @@ func TestSendEmail_Success(t *testing.T) {
 		[]string{"to@test.com"},
 		"Test Subject",
 		"Test Body",
+		nil,
 	)
 
 	if err != nil {
@@ -61,6 +62,7 @@ func TestSendEmail_MultipleRecipients(t *testing.T) {
 		recipients,
 		"Test Subject",
 		"Test Body",
+		nil,
 	)
 
 	if err != nil {
@@ -87,6 +89,7 @@ func TestSendEmail_SESError(t *testing.T) {
 		[]string{"to@test.com"},
 		"Test Subject",
 		"Test Body",
+		nil,
 	)
 
 	if err == nil {

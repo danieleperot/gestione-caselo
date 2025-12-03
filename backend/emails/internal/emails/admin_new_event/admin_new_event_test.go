@@ -90,6 +90,26 @@ func TestSubject(t *testing.T) {
 	}
 }
 
+func TestReplyTo(t *testing.T) {
+	metadata := map[string]interface{}{
+		"eventId":       "evt_123",
+		"customerEmail": "customer@example.com",
+	}
+	adminEmails := []string{"admin@test.com"}
+
+	email, _ := New(metadata, adminEmails)
+
+	replyTo := email.ReplyTo()
+
+	if len(replyTo) != 1 {
+		t.Errorf("Expected 1 reply-to address, got %d", len(replyTo))
+	}
+
+	if replyTo[0] != "customer@example.com" {
+		t.Errorf("Reply-to = %v, want customer@example.com", replyTo[0])
+	}
+}
+
 func TestRender(t *testing.T) {
 	metadata := map[string]interface{}{
 		"eventId":       "evt_123",

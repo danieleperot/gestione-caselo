@@ -83,6 +83,21 @@ func TestSubject(t *testing.T) {
 	}
 }
 
+func TestReplyTo(t *testing.T) {
+	metadata := map[string]interface{}{
+		"eventId":       "evt_123",
+		"customerEmail": "customer@test.com",
+	}
+
+	email, _ := New(metadata)
+
+	replyTo := email.ReplyTo()
+
+	if replyTo != nil {
+		t.Errorf("Expected nil reply-to, got %v", replyTo)
+	}
+}
+
 func TestRender(t *testing.T) {
 	metadata := map[string]interface{}{
 		"eventId":       "evt_123",
