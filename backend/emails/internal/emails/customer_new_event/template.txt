@@ -7,3 +7,5 @@ Data: {{.eventDate}}
 Tipo: {{.eventType}}
 
 Esamineremo la tua richiesta e ti contatteremo a breve.
+
+Non puoi rispondere direttamente a questa email.

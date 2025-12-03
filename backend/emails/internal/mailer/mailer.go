@@ -20,7 +20,7 @@ func New(client SESClient) *Mailer {
 	return &Mailer{client: client}
 }
 
-func (m *Mailer) SendEmail(ctx context.Context, from string, to []string, subject, body string) error {
+func (m *Mailer) SendEmail(ctx context.Context, from string, to []string, subject, body string, replyTo []string) error {
 	input := &ses.SendEmailInput{
 		Source: &from,
 		Destination: &types.Destination{
@@ -36,6 +36,10 @@ func (m *Mailer) SendEmail(ctx context.Context, from string, to []string, subjec
 				},
 			},
 		},
+	}
+
+	if len(replyTo) > 0 {
+		input.ReplyToAddresses = replyTo
 	}
 
 	_, err := m.client.SendEmail(ctx, input)
