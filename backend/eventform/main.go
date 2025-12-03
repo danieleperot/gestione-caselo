@@ -60,17 +60,25 @@ func main() {
 	resolver := graphql.NewResolver(queueClient)
 	srv := handler.NewDefaultServer(graphql.NewExecutableSchema(graphql.Config{Resolvers: resolver}))
 
-	mux := http.NewServeMux()
-	mux.Handle("/", playground.Handler("GraphQL playground", "/graphql"))
-	mux.Handle("/graphql", srv)
-
 	corsMiddlewareWithOrigins := corsMiddlewareWithConfig(origins)
+	mux := http.NewServeMux()
 
 	if os.Getenv("AWS_LAMBDA_FUNCTION_NAME") != "" {
-		lambda.Start(httpadapter.New(corsMiddlewareWithOrigins(mux)).ProxyWithContext)
+		// Production: only serve GraphQL endpoint
+		mux.Handle("/graphql", srv)
+		adapter := httpadapter.NewV2(corsMiddlewareWithOrigins(mux))
+		lambda.Start(adapter.ProxyWithContext)
 	} else {
+		// Local development: serve both GraphQL and playground
+		mux.Handle("/graphql", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			if r.Method == "GET" {
+				playground.Handler("GraphQL playground", "/graphql").ServeHTTP(w, r)
+			} else {
+				srv.ServeHTTP(w, r)
+			}
+		}))
 		fmt.Println("Server starting on :8080")
-		fmt.Println("GraphQL playground available at http://localhost:8080")
+		fmt.Println("GraphQL playground available at http://localhost:8080/graphql")
 		if err := http.ListenAndServe(":8080", corsMiddlewareWithOrigins(mux)); err != nil {
 			log.Fatal(err)
 		}
