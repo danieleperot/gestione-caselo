@@ -10,7 +10,6 @@ import (
 	"github.com/99designs/gqlgen/graphql/playground"
 	"github.com/aws/aws-lambda-go/lambda"
 	"github.com/awslabs/aws-lambda-go-api-proxy/httpadapter"
-	"github.com/daniele/gestione-caselo/backend/eventform/internal/auth"
 	"github.com/daniele/gestione-caselo/backend/eventform/internal/graphql"
 	appconfig "github.com/daniele/gestione-caselo/backend/internal/config"
 )
@@ -33,17 +32,13 @@ func corsMiddlewareWithConfig(origins string) func(http.Handler) http.Handler {
 }
 
 func main() {
-	endpoint := appconfig.GetEnvVariable("COGNITO_ENDPOINT")
-	poolID := appconfig.GetEnvVariable("COGNITO_POOL_ID")
 	origins := appconfig.GetEnvVariable("ALLOWED_ORIGINS")
 
 	srv := handler.NewDefaultServer(graphql.NewExecutableSchema(graphql.Config{Resolvers: &graphql.Resolver{}}))
 
 	mux := http.NewServeMux()
 	mux.Handle("/", playground.Handler("GraphQL playground", "/graphql"))
-
-	jwksURL := fmt.Sprintf("%s/%s/.well-known/jwks.json", endpoint, poolID)
-	mux.Handle("/graphql", auth.Middleware(auth.Config{JWKSUrl: jwksURL})(srv))
+	mux.Handle("/graphql", srv)
 
 	corsMiddlewareWithOrigins := corsMiddlewareWithConfig(origins)
 

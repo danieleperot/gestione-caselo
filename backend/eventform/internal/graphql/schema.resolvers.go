@@ -6,21 +6,14 @@ package graphql
 
 import (
 	"context"
-	"fmt"
 
-	"github.com/daniele/gestione-caselo/backend/eventform/internal/auth"
 	"github.com/daniele/gestione-caselo/backend/eventform/internal/graphql/model"
 )
 
 // Hello is the resolver for the hello field.
 func (r *queryResolver) Hello(ctx context.Context) (*model.HelloResponse, error) {
-	user := auth.GetUserFromContext(ctx)
-	if user == nil {
-		return nil, fmt.Errorf("unauthorized: no user in context")
-	}
-
 	return &model.HelloResponse{
-		Message: fmt.Sprintf("Hello World! How are you doing, %s?", user.Email),
+		Message: "Hello World!",
 	}, nil
 }
 
