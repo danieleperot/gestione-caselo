@@ -2,6 +2,25 @@ type Query {
     hello: HelloResponse!
 }
 
+type Mutation {
+    submitEventBooking(input: EventBookingInput!): EventBookingResponse!
+}
+
 type HelloResponse {
     message: String!
+}
+
+type EventBookingResponse {
+    success: Boolean!
+    message: String!
+}
+
+input EventBookingInput {
+    fullName: String!
+    association: String
+    email: String!
+    phone: String!
+    description: String!
+    date: String!
+    acceptData: Boolean!
 }

@@ -2,8 +2,26 @@
 
 package model
 
+type EventBookingInput struct {
+	FullName    string  `json:"fullName"`
+	Association *string `json:"association,omitempty"`
+	Email       string  `json:"email"`
+	Phone       string  `json:"phone"`
+	Description string  `json:"description"`
+	Date        string  `json:"date"`
+	AcceptData  bool    `json:"acceptData"`
+}
+
+type EventBookingResponse struct {
+	Success bool   `json:"success"`
+	Message string `json:"message"`
+}
+
 type HelloResponse struct {
 	Message string `json:"message"`
+}
+
+type Mutation struct {
 }
 
 type Query struct {
