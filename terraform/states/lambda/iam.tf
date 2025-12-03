@@ -89,6 +89,24 @@ resource "aws_iam_role_policy" "eventform_ssm" {
   })
 }
 
+resource "aws_iam_role_policy" "eventform_sqs" {
+  name = "sqs-send"
+  role = aws_iam_role.eventform.id
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Action = [
+          "sqs:SendMessage"
+        ]
+        Resource = module.queues.emails_arn
+      }
+    ]
+  })
+}
+
 # IAM role for emails Lambda
 resource "aws_iam_role" "emails" {
   name = "${local.prefix}-emails"

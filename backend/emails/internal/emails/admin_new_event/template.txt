@@ -3,9 +3,16 @@ Nuova Richiesta Evento
 È stato inviato un nuovo evento che richiede la tua revisione:
 
 ID Evento: {{.eventId}}
-Richiedente: {{.customerEmail}}
-Data: {{.eventDate}}
-Tipo: {{.eventType}}
+
+Dati Richiedente:
+- Nome: {{.fullName}}
+- Email: {{.customerEmail}}
+- Telefono: {{.phone}}{{if .association}}
+- Associazione: {{.association}}{{end}}
+
+Dettagli Evento:
+- Data: {{.eventDate}}
+- Descrizione: {{.description}}
 
 Per favore accedi al pannello di amministrazione per revisionare questo evento.
 

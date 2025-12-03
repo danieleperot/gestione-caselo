@@ -10,6 +10,8 @@ import (
 	"fmt"
 
 	"github.com/daniele/gestione-caselo/backend/eventform/internal/graphql/model"
+	"github.com/daniele/gestione-caselo/backend/eventform/internal/queue"
+	"github.com/google/uuid"
 )
 
 // SubmitEventBooking is the resolver for the submitEventBooking field.
@@ -34,7 +36,40 @@ func (r *mutationResolver) SubmitEventBooking(ctx context.Context, input model.E
 		return nil, fmt.Errorf("acceptData must be true")
 	}
 
-	// TODO: Queue email jobs for admin and customer
+	// Generate event ID
+	eventID := uuid.New().String()
+
+	// Prepare metadata for email templates
+	metadata := map[string]interface{}{
+		"eventId":       eventID,
+		"fullName":      input.FullName,
+		"customerEmail": input.Email,
+		"phone":         input.Phone,
+		"description":   input.Description,
+		"eventDate":     input.Date,
+	}
+
+	if input.Association != nil {
+		metadata["association"] = *input.Association
+	}
+
+	// Queue admin notification email
+	adminEmail := queue.EmailMessage{
+		Template: "admin_new_event",
+		Metadata: metadata,
+	}
+	if err := r.queueClient.SendEmailMessage(ctx, adminEmail); err != nil {
+		return nil, fmt.Errorf("failed to queue admin email: %w", err)
+	}
+
+	// Queue customer confirmation email
+	customerEmail := queue.EmailMessage{
+		Template: "customer_new_event",
+		Metadata: metadata,
+	}
+	if err := r.queueClient.SendEmailMessage(ctx, customerEmail); err != nil {
+		return nil, fmt.Errorf("failed to queue customer email: %w", err)
+	}
 
 	return &model.EventBookingResponse{
 		Success: true,

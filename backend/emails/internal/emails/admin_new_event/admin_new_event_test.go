@@ -113,9 +113,12 @@ func TestReplyTo(t *testing.T) {
 func TestRender(t *testing.T) {
 	metadata := map[string]interface{}{
 		"eventId":       "evt_123",
+		"fullName":      "Mario Rossi",
 		"customerEmail": "customer@example.com",
+		"phone":         "0123456789",
+		"description":   "Evento di compleanno per 15 persone",
 		"eventDate":     "2025-12-01",
-		"eventType":     "Wedding",
+		"association":   "Associazione ricreativa",
 	}
 	adminEmails := []string{"admin@test.com"}
 
@@ -130,15 +133,27 @@ func TestRender(t *testing.T) {
 		t.Error("Body should contain eventId")
 	}
 
+	if !strings.Contains(body, "Mario Rossi") {
+		t.Error("Body should contain fullName")
+	}
+
 	if !strings.Contains(body, "customer@example.com") {
 		t.Error("Body should contain customerEmail")
+	}
+
+	if !strings.Contains(body, "0123456789") {
+		t.Error("Body should contain phone")
+	}
+
+	if !strings.Contains(body, "Evento di compleanno per 15 persone") {
+		t.Error("Body should contain description")
 	}
 
 	if !strings.Contains(body, "2025-12-01") {
 		t.Error("Body should contain eventDate")
 	}
 
-	if !strings.Contains(body, "Wedding") {
-		t.Error("Body should contain eventType")
+	if !strings.Contains(body, "Associazione ricreativa") {
+		t.Error("Body should contain association")
 	}
 }
