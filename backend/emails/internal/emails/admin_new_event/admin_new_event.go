@@ -1,11 +1,10 @@
 package admin_new_event
 
 import (
-	"bytes"
 	_ "embed"
 	"fmt"
-	"text/template"
 
+	"github.com/daniele/gestione-caselo/backend/emails/internal/emails"
 	"github.com/daniele/gestione-caselo/backend/emails/internal/message"
 )
 
@@ -38,20 +37,9 @@ func (e *AdminNewEvent) Recipients() ([]string, error) {
 }
 
 func (e *AdminNewEvent) Subject() string {
-	eventId := e.metadata["eventId"].(string)
-	return fmt.Sprintf("New Event Request - %s", eventId)
+	return "Nuova Richiesta Evento"
 }
 
 func (e *AdminNewEvent) Render() (string, error) {
-	tmpl, err := template.New("admin_new_event").Parse(templateContent)
-	if err != nil {
-		return "", fmt.Errorf("failed to parse template: %w", err)
-	}
-
-	var buf bytes.Buffer
-	if err := tmpl.Execute(&buf, e.metadata); err != nil {
-		return "", fmt.Errorf("failed to render template: %w", err)
-	}
-
-	return buf.String(), nil
+	return emails.RenderTemplate("admin_new_event", templateContent, e.metadata)
 }

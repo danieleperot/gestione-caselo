@@ -1,9 +1,9 @@
-Event Submission Confirmed
+Richiesta Evento Confermata
 
-Thank you for submitting your event request!
+Grazie per aver inviato la richiesta per il tuo evento!
 
-Event ID: {{.eventId}}
-Date: {{.eventDate}}
-Type: {{.eventType}}
+ID Evento: {{.eventId}}
+Data: {{.eventDate}}
+Tipo: {{.eventType}}
 
-We will review your request and contact you shortly.
+Esamineremo la tua richiesta e ti contatteremo a breve.

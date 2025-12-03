@@ -7,10 +7,10 @@ import (
 
 func TestNew_ValidMetadata(t *testing.T) {
 	metadata := map[string]interface{}{
-		"eventId":   "evt_123",
-		"userName":  "John Doe",
-		"eventDate": "2025-12-01",
-		"eventType": "Wedding",
+		"eventId":       "evt_123",
+		"customerEmail": "customer@example.com",
+		"eventDate":     "2025-12-01",
+		"eventType":     "Wedding",
 	}
 	adminEmails := []string{"admin@test.com", "manager@test.com"}
 
@@ -26,7 +26,7 @@ func TestNew_ValidMetadata(t *testing.T) {
 
 func TestNew_MissingEventId(t *testing.T) {
 	metadata := map[string]interface{}{
-		"userName": "John Doe",
+		"customerEmail": "customer@example.com",
 	}
 	adminEmails := []string{"admin@test.com"}
 
@@ -83,7 +83,7 @@ func TestSubject(t *testing.T) {
 	email, _ := New(metadata, adminEmails)
 
 	subject := email.Subject()
-	expected := "New Event Request - evt_123"
+	expected := "Nuova Richiesta Evento"
 
 	if subject != expected {
 		t.Errorf("Subject = %v, want %v", subject, expected)
@@ -92,10 +92,10 @@ func TestSubject(t *testing.T) {
 
 func TestRender(t *testing.T) {
 	metadata := map[string]interface{}{
-		"eventId":   "evt_123",
-		"userName":  "John Doe",
-		"eventDate": "2025-12-01",
-		"eventType": "Wedding",
+		"eventId":       "evt_123",
+		"customerEmail": "customer@example.com",
+		"eventDate":     "2025-12-01",
+		"eventType":     "Wedding",
 	}
 	adminEmails := []string{"admin@test.com"}
 
@@ -110,8 +110,8 @@ func TestRender(t *testing.T) {
 		t.Error("Body should contain eventId")
 	}
 
-	if !strings.Contains(body, "John Doe") {
-		t.Error("Body should contain userName")
+	if !strings.Contains(body, "customer@example.com") {
+		t.Error("Body should contain customerEmail")
 	}
 
 	if !strings.Contains(body, "2025-12-01") {

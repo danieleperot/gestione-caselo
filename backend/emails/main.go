@@ -34,7 +34,7 @@ func init() {
 
 	fromAddr := appconfig.GetEnvVariable("FROM_ADDRESS")
 	if fromAddr == "" {
-		fromAddr = "noreply@gestione-caselo.it"
+		log.Fatal("FROM_ADDRESS is required")
 	}
 
 	cfg, err := config.LoadDefaultConfig(ctx)

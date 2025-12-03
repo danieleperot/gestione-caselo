@@ -76,7 +76,7 @@ func TestSubject(t *testing.T) {
 	email, _ := New(metadata)
 
 	subject := email.Subject()
-	expected := "Event Submission Confirmed - evt_123"
+	expected := "Richiesta Evento Confermata"
 
 	if subject != expected {
 		t.Errorf("Subject = %v, want %v", subject, expected)
