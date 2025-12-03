@@ -139,7 +139,7 @@ resource "aws_iam_role_policy" "emails_sqs_ses" {
           "ses:SendEmail",
           "ses:SendRawEmail"
         ]
-        Resource = "*"
+        Resource = data.aws_ses_domain_identity.main.arn
       }
     ]
   })

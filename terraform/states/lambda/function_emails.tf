@@ -62,8 +62,4 @@ resource "aws_lambda_event_source_mapping" "emails_sqs" {
   function_name    = aws_lambda_function.emails.arn
   batch_size       = 1
   enabled          = true
-
-  scaling_config {
-    maximum_concurrency = 2 # Limit concurrent Lambda executions for rate limiting
-  }
 }

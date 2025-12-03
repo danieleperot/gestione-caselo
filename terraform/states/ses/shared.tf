@@ -7,6 +7,6 @@ module "shared" {
 }
 
 locals {
-  prefix = module.shared.prefix
   tags   = module.shared.tags
+  domain = module.shared.domain
 }
