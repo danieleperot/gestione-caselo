@@ -196,6 +196,15 @@ resource "aws_iam_role_policy" "github_actions_frontend_stage" {
           "cloudfront:ListDistributions"
         ]
         Resource = "*"
+      },
+      {
+        Effect = "Allow"
+        Action = [
+          "ssm:GetParameter",
+          "ssm:GetParameters",
+          "ssm:GetParametersByPath"
+        ]
+        Resource = "arn:aws:ssm:*:*:parameter/gestione-caselo/ci/*"
       }
     ]
   })
@@ -262,6 +271,15 @@ resource "aws_iam_role_policy" "github_actions_frontend_prod" {
           "cloudfront:ListDistributions"
         ]
         Resource = "*"
+      },
+      {
+        Effect = "Allow"
+        Action = [
+          "ssm:GetParameter",
+          "ssm:GetParameters",
+          "ssm:GetParametersByPath"
+        ]
+        Resource = "arn:aws:ssm:*:*:parameter/gestione-caselo/ci/*"
       }
     ]
   })
