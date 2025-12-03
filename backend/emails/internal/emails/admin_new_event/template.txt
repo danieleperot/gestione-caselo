@@ -1,10 +1,10 @@
-New Event Request
+Nuova Richiesta Evento
 
-A new event has been submitted and requires review:
+È stato inviato un nuovo evento che richiede la tua revisione:
 
-Event ID: {{.eventId}}
-Customer: {{.userName}}
-Date: {{.eventDate}}
-Type: {{.eventType}}
+ID Evento: {{.eventId}}
+Richiedente: {{.customerEmail}}
+Data: {{.eventDate}}
+Tipo: {{.eventType}}
 
-Please log in to the admin panel to review this event.
+Per favore accedi al pannello di amministrazione per revisionare questo evento.

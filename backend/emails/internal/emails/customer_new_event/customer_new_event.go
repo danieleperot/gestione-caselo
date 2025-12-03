@@ -1,11 +1,10 @@
 package customer_new_event
 
 import (
-	"bytes"
 	_ "embed"
 	"fmt"
-	"text/template"
 
+	"github.com/daniele/gestione-caselo/backend/emails/internal/emails"
 	"github.com/daniele/gestione-caselo/backend/emails/internal/message"
 )
 
@@ -38,20 +37,9 @@ func (e *CustomerNewEvent) Recipients() ([]string, error) {
 }
 
 func (e *CustomerNewEvent) Subject() string {
-	eventId := e.metadata["eventId"].(string)
-	return fmt.Sprintf("Event Submission Confirmed - %s", eventId)
+	return "Richiesta Evento Confermata"
 }
 
 func (e *CustomerNewEvent) Render() (string, error) {
-	tmpl, err := template.New("customer_new_event").Parse(templateContent)
-	if err != nil {
-		return "", fmt.Errorf("failed to parse template: %w", err)
-	}
-
-	var buf bytes.Buffer
-	if err := tmpl.Execute(&buf, e.metadata); err != nil {
-		return "", fmt.Errorf("failed to render template: %w", err)
-	}
-
-	return buf.String(), nil
+	return emails.RenderTemplate("customer_new_event", templateContent, e.metadata)
 }

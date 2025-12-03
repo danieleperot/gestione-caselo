@@ -38,9 +38,7 @@ resource "aws_lambda_function" "emails" {
 
   environment {
     variables = {
-      ENVIRONMENT  = var.environment
-      ADMIN_EMAILS = "admin@gestione-caselo.it,manager@gestione-caselo.it"
-      FROM_ADDRESS = "noreply@gestione-caselo.it"
+      ENVIRONMENT = var.environment
     }
   }
 
