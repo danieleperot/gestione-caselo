@@ -361,3 +361,24 @@ const { result, loading, error } = useQuery(QUERY)
 ## Questions Welcome
 
 If something in these rules is unclear or doesn't match your workflow, let me know and we'll adjust.
+
+## Frontend Testing and Debugging
+
+
+### Using Playwright MCP Server
+
+When troubleshooting HTML, CSS, and JavaScript issues in the application frontend, use the Playwright MCP server tools:
+
+1. **Accessing frontend pages**:
+   - Navigate to `http://localhost:5173/` or the configured port
+   - Use `mcp__playwright__browser_navigate` to open pages
+   - Use `mcp__playwright__browser_snapshot` to capture the current page state
+   - Use `mcp__playwright__browser_console_messages` to view JavaScript console output
+
+2. **Common debugging workflows**:
+   - **HTML/CSS issues**: Use `mcp__playwright__browser_snapshot` to inspect the DOM structure
+   - **JavaScript errors**: Check `mcp__playwright__browser_console_messages` for error logs
+   - **Interactive debugging**: Use `mcp__playwright__browser_evaluate` to run JavaScript in the page context
+   - **Network issues**: Monitor API calls with `mcp__playwright__browser_network_requests`
+
+Adding !important to CSS styles to fix issues is not allowed.

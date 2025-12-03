@@ -11,8 +11,6 @@ services:
       - AWS_REGION=eu-south-1
       - AWS_ACCESS_KEY_ID=test
       - AWS_SECRET_ACCESS_KEY=test
-    depends_on:
-      - cognito-local
     volumes:
       - ./backend/eventform:/app
     networks:
@@ -73,16 +71,6 @@ services:
         - action: restart
           path: ./frontend/.env
 
-  cognito-local:
-    image: jagregory/cognito-local:latest
-    stop_grace_period: "1s"
-    ports:
-      - "9229:9229"
-    volumes:
-      - cognito-data:/app/.cognito
-    networks:
-      - caselo-network
-
   elasticmq:
     image: softwaremill/elasticmq-native:latest
     ports:
@@ -113,5 +101,4 @@ networks:
 
 volumes:
   pnpm-store:
-  cognito-data:
   localstack-data:
