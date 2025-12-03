@@ -6,10 +6,26 @@ import (
 
 	"github.com/daniele/gestione-caselo/backend/eventform/internal/graphql"
 	"github.com/daniele/gestione-caselo/backend/eventform/internal/graphql/model"
+	"github.com/daniele/gestione-caselo/backend/eventform/internal/queue"
 )
 
+type mockQueueClient struct {
+	messages []queue.EmailMessage
+}
+
+func (m *mockQueueClient) SendEmailMessage(ctx context.Context, msg queue.EmailMessage) error {
+	m.messages = append(m.messages, msg)
+	return nil
+}
+
+func newMockQueueClient() *mockQueueClient {
+	return &mockQueueClient{
+		messages: make([]queue.EmailMessage, 0),
+	}
+}
+
 func TestHelloQuery(t *testing.T) {
-	resolver := &graphql.Resolver{}
+	resolver := graphql.NewResolver(nil)
 
 	result, err := resolver.Query().Hello(context.Background())
 
@@ -132,7 +148,8 @@ func TestSubmitEventBooking(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			resolver := &graphql.Resolver{}
+			mockQueue := newMockQueueClient()
+			resolver := graphql.NewResolver(mockQueue)
 
 			result, err := resolver.Mutation().SubmitEventBooking(context.Background(), tt.input)
 
@@ -157,6 +174,30 @@ func TestSubmitEventBooking(t *testing.T) {
 
 			if result.Message == "" {
 				t.Errorf("SubmitEventBooking() message is empty")
+			}
+
+			// Verify that two email messages were queued
+			if len(mockQueue.messages) != 2 {
+				t.Errorf("Expected 2 email messages to be queued, got %d", len(mockQueue.messages))
+			}
+
+			// Verify admin email was queued
+			foundAdmin := false
+			foundCustomer := false
+			for _, msg := range mockQueue.messages {
+				if msg.Template == "admin_new_event" {
+					foundAdmin = true
+				}
+				if msg.Template == "customer_new_event" {
+					foundCustomer = true
+				}
+			}
+
+			if !foundAdmin {
+				t.Error("admin_new_event email was not queued")
+			}
+			if !foundCustomer {
+				t.Error("customer_new_event email was not queued")
 			}
 		})
 	}

@@ -1,11 +1,14 @@
 Richiesta Evento Confermata
 
+Ciao {{.fullName}},
+
 Grazie per aver inviato la richiesta per il tuo evento!
 
-ID Evento: {{.eventId}}
-Data: {{.eventDate}}
-Tipo: {{.eventType}}
+Riepilogo Richiesta:
+- ID Riferimento: {{.eventId}}
+- Data Evento: {{.eventDate}}
+- Descrizione: {{.description}}
 
-Esamineremo la tua richiesta e ti contatteremo a breve.
+Esamineremo la tua richiesta e ti contatteremo a breve all'indirizzo {{.customerEmail}} o al numero {{.phone}}.
 
 Non puoi rispondere direttamente a questa email.

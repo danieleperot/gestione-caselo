@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"log"
 	"net/http"
@@ -9,8 +10,11 @@ import (
 	"github.com/99designs/gqlgen/graphql/handler"
 	"github.com/99designs/gqlgen/graphql/playground"
 	"github.com/aws/aws-lambda-go/lambda"
+	"github.com/aws/aws-sdk-go-v2/config"
+	"github.com/aws/aws-sdk-go-v2/service/sqs"
 	"github.com/awslabs/aws-lambda-go-api-proxy/httpadapter"
 	"github.com/daniele/gestione-caselo/backend/eventform/internal/graphql"
+	"github.com/daniele/gestione-caselo/backend/eventform/internal/queue"
 	appconfig "github.com/daniele/gestione-caselo/backend/internal/config"
 )
 
@@ -32,9 +36,29 @@ func corsMiddlewareWithConfig(origins string) func(http.Handler) http.Handler {
 }
 
 func main() {
+	ctx := context.Background()
 	origins := appconfig.GetEnvVariable("ALLOWED_ORIGINS")
+	queueURL := appconfig.GetEnvVariable("SQS_QUEUE_URL")
 
-	srv := handler.NewDefaultServer(graphql.NewExecutableSchema(graphql.Config{Resolvers: &graphql.Resolver{}}))
+	cfg, err := config.LoadDefaultConfig(ctx)
+	if err != nil {
+		log.Fatalf("Failed to load AWS config: %v", err)
+	}
+
+	// Configure SQS client with custom endpoint if AWS_ENDPOINT_URL is set
+	var sqsClient *sqs.Client
+	if endpointURL := os.Getenv("AWS_ENDPOINT_URL"); endpointURL != "" {
+		sqsClient = sqs.NewFromConfig(cfg, func(o *sqs.Options) {
+			o.BaseEndpoint = &endpointURL
+		})
+	} else {
+		sqsClient = sqs.NewFromConfig(cfg)
+	}
+
+	queueClient := queue.New(sqsClient, queueURL)
+
+	resolver := graphql.NewResolver(queueClient)
+	srv := handler.NewDefaultServer(graphql.NewExecutableSchema(graphql.Config{Resolvers: resolver}))
 
 	mux := http.NewServeMux()
 	mux.Handle("/", playground.Handler("GraphQL playground", "/graphql"))

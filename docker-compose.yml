@@ -11,6 +11,10 @@ services:
       - AWS_REGION=eu-south-1
       - AWS_ACCESS_KEY_ID=test
       - AWS_SECRET_ACCESS_KEY=test
+      - SQS_QUEUE_URL=http://elasticmq:9324/000000000000/emails
+      - AWS_ENDPOINT_URL=http://elasticmq:9324
+    depends_on:
+      - elasticmq
     volumes:
       - ./backend/eventform:/app
     networks:
